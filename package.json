@@ -7,21 +7,17 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
-    "electron:serve": "vue-cli-service electron:serve",
+    "dev": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
   },
   "main": "background.js",
-  "dependencies": {},
+  "dependencies": {
+    "electron-store": "^6.0.1",
+    "element-ui": "^2.14.1"
+  },
   "devDependencies": {
     "@mdi/font": "^3.9.97",
-    "core-js": "^3.6.5",
-    "register-service-worker": "^1.7.1",
-    "roboto-fontface": "*",
-    "vue": "^2.6.12",
-    "vue-router": "^3.4.6",
-    "vuetify": "^2.3.13",
-    "vuex": "^3.5.1",
     "@types/electron-devtools-installer": "^2.2.0",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
@@ -34,6 +30,7 @@
     "@vue/cli-service": "~4.5.7",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^5.1.0",
+    "core-js": "^3.6.5",
     "electron": "^9.3.2",
     "electron-devtools-installer": "^3.1.1",
     "eslint": "^6.8.0",
@@ -41,12 +38,19 @@
     "eslint-plugin-vue": "^6.2.2",
     "node-sass": "^4.14.1",
     "prettier": "^1.19.1",
+    "register-service-worker": "^1.7.1",
+    "roboto-fontface": "*",
     "sass": "^1.26.11",
     "sass-loader": "^8.0.2",
+    "sass-resources-loader": "^2.1.1",
     "typescript": "~3.9.7",
+    "vue": "^2.6.12",
     "vue-cli-plugin-electron-builder": "~2.0.0-rc.4",
     "vue-cli-plugin-vuetify": "~2.0.7",
+    "vue-router": "^3.4.6",
     "vue-template-compiler": "^2.6.12",
-    "vuetify-loader": "^1.6.0"
+    "vuetify": "^2.3.13",
+    "vuetify-loader": "^1.6.0",
+    "vuex": "^3.5.1"
   }
 }

@@ -1,12 +1,13 @@
 <template>
-  <div>
-    <router-view></router-view>
-  </div>
+  <div>content</div>
 </template>
 
 <script lang='ts'>
 import Vue from "vue";
 export default Vue.extend({
-  name: "APP",
+  name: "HomeContent",
 });
 </script>
+
+<style>
+</style>
