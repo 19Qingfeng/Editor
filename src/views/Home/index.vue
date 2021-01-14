@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
 import Vue from "vue";
 import HeaderCmp from "./components/header.vue";
 import DialogCmp from "./components/pictureDialog.vue";
@@ -28,21 +28,22 @@ export default Vue.extend({
   components: {
     HeaderCmp,
     DialogCmp,
+    ContentCmp
   },
   data() {
     return {
-      isShow: false,
+      isShow: false
     };
   },
   methods: {
     addPictureBook() {
       this.isShow = true;
-    },
-  },
+    }
+  }
 });
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .m-home {
   .add-btn {
     display: flex;

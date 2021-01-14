@@ -5,7 +5,7 @@
     custom-class="home-body-dialog"
     :before-close="handleClose"
   >
-    <div class="wrapper">
+    <div class="wrapper" v-loading="loading">
       <div class="left">
         <div
           class="no-img"
@@ -17,7 +17,7 @@
         </div>
         <template v-if="imgPath">
           <img class="img" :src="imgPath" alt="" />
-          <div class="replace-img button--itzel" @click="replaceImg">替换</div>
+          <div class="replace-img button--itzel" @click="addCoverImg">替换</div>
         </template>
       </div>
       <div class="right">
@@ -87,99 +87,145 @@
   </el-dialog>
 </template>
 
-<script>
-export default {
-  name: "HomeDialog",
+<script lang="ts">
+import Vue from "vue";
+import { PictureBook, BaseInfo } from "../../../types/pictureBook";
+import { ipcRenderer } from "electron";
+import { basename } from "path";
+import { unZip } from "../../../utils/zip";
+import Component from "vue-class-component";
+
+const GreetingProps = Vue.extend({
   props: {
-    isShow: {
-      type: Boolean,
-      default: false,
+    isShow: Boolean
+  }
+});
+
+@Component
+export default class PictureDialog extends GreetingProps {
+  imgPath = ""; // 背景图路径
+  zipPath = ""; // zip包资源file协议路径
+  originZipPath = ""; // zip包资源原始路径
+  unZipDirPath = ""; // 资源解压后的路径 非file协议
+  loading = false;
+  title = "添加绘本";
+  form = {
+    name: "1",
+    author: "2",
+    tag: [1],
+    age: 0,
+    category: 0,
+    preview: "预览",
+    guidance: "指导"
+  };
+  categoryList = [
+    {
+      value: 0,
+      label: "基础认知"
     },
-  },
-  computed: {
-    dialogVisible: {
-      get() {
-        return this.isShow;
-      },
-      set(val) {
-        this.$emit("update:isShow", val);
-      },
+    {
+      value: 1,
+      label: "情绪与社交"
     },
-    formatZipPath() {
-      return "";
-      // return (this as any).zipPath ? basename(this.zipPath) : "";
-    },
-  },
-  data() {
-    const validateZip = (value, rule, callback) => {
-      if (!this.zipPath) callback(new Error("zip包必填"));
-      else callback();
+    {
+      value: 2,
+      label: "行为习惯"
+    }
+  ];
+  tagList = [
+    { label: "动物", value: 1 },
+    { label: "母爱", value: 2 }
+  ];
+  ageList = [
+    { label: "1-2岁", value: 0 },
+    { label: "2-4岁", value: 1 }
+  ];
+  rules = {
+    name: [{ max: 32, message: "最多输入32位", trigger: "blur" }],
+    author: [{ max: 20, message: "最多输入20位", trigger: "blur" }],
+    preview: [{ max: 200, message: "最多输入200位", trigger: "blur" }],
+    guidance: [{ max: 200, message: "最多输入200位", trigger: "blur" }],
+    zip: [{ validator: this.validateZip, trigger: "blur" }]
+  };
+  get dialogVisible() {
+    return this.isShow;
+  }
+  set dialogVisible(val) {
+    this.$emit("update:isShow", val);
+  }
+  get formatZipPath() {
+    return this.zipPath ? basename(this.zipPath) : "";
+  }
+  created() {
+    this.initEvent();
+  }
+  initEvent(): void {
+    ipcRenderer.on("on-upload-cover-success", (event, params) => {
+      this.uploadCoverSuccess(params);
+    });
+    ipcRenderer.on("on-upload-zip-success", (event, params) => {
+      this.uploadZipSuccess(params);
+    });
+  }
+  validateZip(value: any, rule: any, callback: any) {
+    if (!this.zipPath) {
+      callback(new Error("zip包必填"));
+    } else {
+      callback();
+    }
+  }
+  uploadCoverSuccess({ filePath }: any): void {
+    this.imgPath = filePath;
+  }
+  uploadZipSuccess({ filePath, originPath }: any): void {
+    this.zipPath = filePath;
+    this.originZipPath = originPath;
+  }
+  handleClose(): void {
+    this.dialogVisible = false;
+  }
+  addCoverImg(): void {
+    ipcRenderer.send("on-upload-cover-img");
+  }
+  onUploadZip() {
+    ipcRenderer.send("on-upload-zip");
+  }
+  getParams(): PictureBook {
+    const { name, author, tag, age, category, preview, guidance } = this.form;
+    const baseInfo: BaseInfo = {
+      name,
+      author,
+      tag,
+      age,
+      category,
+      preview,
+      guidance
     };
+    const cover = this.imgPath;
+    const zip = this.zipPath;
     return {
-      imgPath: "", // 背景图路径
-      zipPath: "", // zip包资源file协议路径
-      originZipPath: "", // zip包资源原始路径
-      unZipDirPath: "", // 资源解压后的路径 非file协议
-      loading: false,
-      title: "添加绘本",
-      form: {
-        name: "1",
-        author: "2",
-        tag: [1],
-        age: 0,
-        category: 0,
-        preview: "预览",
-        guidance: "指导",
-      },
-      categoryList: [
-        {
-          value: 0,
-          label: "基础认知",
-        },
-        {
-          value: 1,
-          label: "情绪与社交",
-        },
-        {
-          value: 2,
-          label: "行为习惯",
-        },
-      ],
-      tagList: [
-        { label: "动物", value: 1 },
-        { label: "母爱", value: 2 },
-      ],
-      ageList: [
-        { label: "1-2岁", value: 0 },
-        { label: "2-4岁", value: 1 },
-      ],
-      rules: {
-        name: [{ max: 32, message: "最多输入32位", trigger: "blur" }],
-        author: [{ max: 20, message: "最多输入20位", trigger: "blur" }],
-        preview: [{ max: 200, message: "最多输入200位", trigger: "blur" }],
-        guidance: [{ max: 200, message: "最多输入200位", trigger: "blur" }],
-        zip: [{ validator: validateZip, trigger: "blur" }],
-      },
+      baseInfo,
+      cover,
+      zip
     };
-  },
-  methods: {
-    handleClose() {
+  }
+  async onSave() {
+    // 当已经存在同名的文件的时候需要手动删除
+    try {
+      this.loading = true;
+      await (this.$refs["form"] as any).validate();
+      const params = this.getParams();
+      await unZip(this.originZipPath);
+      console.log(params, "params压缩完成 应该引入electron-store持久化存储了");
       this.dialogVisible = false;
-    },
-    addCoverImg() {
-      //  nothing
-    },
-    onUploadZip() {
-      //  nothing
-    },
-    onSave() {
-      // nothing
-    },
-  },
-};
+    } catch {
+      this.loading = false;
+    }
+  }
+}
 </script>
 
-<style lang='scss'>
+<style lang="scss">
 .home-body-dialog {
   min-width: 675px;
   .wrapper {
@@ -210,7 +256,8 @@ export default {
       }
       .replace-img {
         height: 26px;
-        color: #ddd;
+        background: $bg-primary;
+        color: $font-primary;
         line-height: 26px;
         cursor: pointer;
         text-align: center;

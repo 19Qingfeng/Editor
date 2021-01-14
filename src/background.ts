@@ -2,6 +2,7 @@
 
 import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
+import electronEvent from "./event";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -25,6 +26,7 @@ function createWindow() {
       // nodeIntegration: (process.env
       //   .ELECTRON_NODE_INTEGRATION as unknown) as boolean
       nodeIntegration: true,
+      webSecurity: false,
     },
   });
 
@@ -64,6 +66,7 @@ app.on("activate", () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", async () => {
+  registerLocalResourceProtocol()
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
@@ -73,6 +76,8 @@ app.on("ready", async () => {
     }
   }
   createWindow();
+
+  electronEvent(app);
 });
 
 // Exit cleanly on request from parent process in development mode.
@@ -88,4 +93,20 @@ if (isDevelopment) {
       app.quit();
     });
   }
+}
+
+
+// 加载本地图片
+function registerLocalResourceProtocol() {
+  protocol.registerFileProtocol('local-resource', (request, callback) => {
+    const url = request.url.replace(/^local-resource:\/\//, '')
+    // Decode URL to prevent errors when loading filenames with UTF-8 chars or chars like "#"
+    const decodedUrl = decodeURI(url) // Needed in case URL contains spaces
+    try {
+      return callback(decodedUrl)
+    }
+    catch (error) {
+      console.error('ERROR: registerLocalResourceProtocol: Could not get file path:', error)
+    }
+  })
 }
