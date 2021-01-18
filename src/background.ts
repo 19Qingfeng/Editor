@@ -12,22 +12,22 @@ let win: BrowserWindow | null;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
-  { scheme: "app", privileges: { secure: true, standard: true } },
+  { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
 
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1400,
+    height: 1000,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       // nodeIntegration: (process.env
       //   .ELECTRON_NODE_INTEGRATION as unknown) as boolean
       nodeIntegration: true,
-      webSecurity: false,
-    },
+      webSecurity: false
+    }
   });
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -66,7 +66,7 @@ app.on("activate", () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", async () => {
-  registerLocalResourceProtocol()
+  registerLocalResourceProtocol();
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
@@ -83,7 +83,7 @@ app.on("ready", async () => {
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === "win32") {
-    process.on("message", (data) => {
+    process.on("message", data => {
       if (data === "graceful-exit") {
         app.quit();
       }
@@ -95,18 +95,19 @@ if (isDevelopment) {
   }
 }
 
-
 // 加载本地图片
 function registerLocalResourceProtocol() {
-  protocol.registerFileProtocol('local-resource', (request, callback) => {
-    const url = request.url.replace(/^local-resource:\/\//, '')
+  protocol.registerFileProtocol("local-resource", (request, callback) => {
+    const url = request.url.replace(/^local-resource:\/\//, "");
     // Decode URL to prevent errors when loading filenames with UTF-8 chars or chars like "#"
-    const decodedUrl = decodeURI(url) // Needed in case URL contains spaces
+    const decodedUrl = decodeURI(url); // Needed in case URL contains spaces
     try {
-      return callback(decodedUrl)
+      return callback(decodedUrl);
+    } catch (error) {
+      console.error(
+        "ERROR: registerLocalResourceProtocol: Could not get file path:",
+        error
+      );
     }
-    catch (error) {
-      console.error('ERROR: registerLocalResourceProtocol: Could not get file path:', error)
-    }
-  })
+  });
 }

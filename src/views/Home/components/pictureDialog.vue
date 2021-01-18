@@ -89,15 +89,17 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { PictureBook, BaseInfo } from "../../../types/pictureBook";
+import { PictureBook, BaseInfo, Source } from "../../../types/index";
 import { ipcRenderer } from "electron";
 import { basename } from "path";
-import { unZip } from "../../../utils/zip";
+import { v4 } from "uuid";
+import { getAllSourcePath } from "../../../utils/zip";
 import Component from "vue-class-component";
 
 const GreetingProps = Vue.extend({
   props: {
-    isShow: Boolean
+    isShow: Boolean,
+    id: String
   }
 });
 
@@ -158,6 +160,33 @@ export default class PictureDialog extends GreetingProps {
   }
   created() {
     this.initEvent();
+    this.initData();
+  }
+  initData(): void {
+    const id = this.id;
+    const pictureList = this.$store.state.picture.pictureList;
+    if (!id) return;
+    const info = pictureList.find((i: any) => i.id === id);
+    if (!info) return;
+    this.backfillPicture(info);
+  }
+  backfillPicture(info: PictureBook): void {
+    const {
+      baseInfo: { name, author, tag, age, category, preview, guidance },
+      cover,
+      zip
+    } = info;
+    this.form = {
+      name,
+      author,
+      tag,
+      age,
+      category,
+      preview,
+      guidance
+    };
+    this.imgPath = cover;
+    this.zipPath = zip;
   }
   initEvent(): void {
     ipcRenderer.on("on-upload-cover-success", (event, params) => {
@@ -190,7 +219,7 @@ export default class PictureDialog extends GreetingProps {
   onUploadZip() {
     ipcRenderer.send("on-upload-zip");
   }
-  getParams(): PictureBook {
+  getParams(sourceList: Source[]): PictureBook {
     const { name, author, tag, age, category, preview, guidance } = this.form;
     const baseInfo: BaseInfo = {
       name,
@@ -204,21 +233,28 @@ export default class PictureDialog extends GreetingProps {
     const cover = this.imgPath;
     const zip = this.zipPath;
     return {
+      id: v4(),
       baseInfo,
       cover,
-      zip
+      sourceList,
+      zip,
+      animationBookList: []
     };
   }
+  onSavePicture(picture: PictureBook) {
+    this.$store.dispatch("picture/addPictureBook", picture);
+  }
   async onSave() {
-    // 当已经存在同名的文件的时候需要手动删除
     try {
       this.loading = true;
       await (this.$refs["form"] as any).validate();
-      const params = this.getParams();
-      await unZip(this.originZipPath);
-      console.log(params, "params压缩完成 应该引入electron-store持久化存储了");
+      const sourceList: Source[] = await getAllSourcePath(this.originZipPath);
+      const params = this.getParams(sourceList);
+      // 接下来就应该保存当前绘本信息
+      this.onSavePicture(params);
       this.dialogVisible = false;
-    } catch {
+    } catch (err) {
+      console.log(err);
       this.loading = false;
     }
   }
@@ -256,6 +292,7 @@ export default class PictureDialog extends GreetingProps {
       }
       .replace-img {
         height: 26px;
+        margin-top: 5px;
         background: $bg-primary;
         color: $font-primary;
         line-height: 26px;

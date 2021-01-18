@@ -1,24 +1,32 @@
-import compressing from "compressing";
-import fs, { mkdirSync } from "fs";
+import AdmZip from "adm-zip";
 import { dirname, basename, join } from "path";
+import { v4 as uuidv4 } from "uuid";
+import { Source } from "../types/index";
+import fs from "fs";
 
-// 解压zip包  获得zip包的绝对路径 进行解压
-const unZip = (path: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const dir = dirname(path);
-    const name = basename(path, ".zip");
-    const stream = fs.createReadStream(path);
-    const output = join(dir, name);
-    mkdirSync(output);
-    compressing.zip
-      .uncompress(stream, output)
-      .then(() => {
-        resolve(output);
-      })
-      .catch(() => {
-        reject();
-      });
-  });
+const unZipByAd = (path: string): string => {
+  const dir = dirname(path);
+  const name = basename(path, ".zip");
+  const zip = new AdmZip(path);
+  zip.extractAllTo(dir);
+  const result = join(dir, name);
+  return result; // 解压后文件路径
 };
 
-export { unZip };
+const getAllSourcePath = async (path: string): Promise<Source[]> => {
+  const sourceDirPath = unZipByAd(path);
+  // 读取文件夹中的所有文件数据
+  const originSourceList = await fs.promises.readdir(sourceDirPath);
+  // 取得file协议路径 以及对应的文件名
+  const filterSource = originSourceList.filter(i => /^(?!\.)/.test(i));
+  const sourceList = filterSource.map(name => {
+    return {
+      id: uuidv4(),
+      path: join(sourceDirPath, name),
+      name
+    };
+  });
+  return sourceList;
+};
+
+export { getAllSourcePath, unZipByAd };

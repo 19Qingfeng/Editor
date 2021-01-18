@@ -1,8 +1,7 @@
 <template>
   <div class="home-header-cmp">
     <div class="inner-left">
-      <span class="left-svg">
-      </span>
+      <span class="left-svg"> </span>
       <span class="left-title">wonder编辑器1.0</span>
     </div>
 
@@ -10,17 +9,17 @@
   </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
 import Vue from "vue";
 export default Vue.extend({
   name: "HomeHeader",
   data() {
     return {};
-  },
+  }
 });
 </script>
 
-<style lang='scss'>
+<style lang="scss">
 .home-header-cmp {
   color: #2a3a4a;
   height: 60px;
