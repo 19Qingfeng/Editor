@@ -5,9 +5,10 @@
     </header>
     <div class="content">
       <source-cmp class="source" :sourceList="sourceList" />
-      <div class="canvas">
+      <div class="canvas-cmp-wrapper">
         <canvas-cmp />
       </div>
+      <operaction-cmp class="opeartion-cmp" />
     </div>
   </div>
 </template>
@@ -17,6 +18,7 @@ import { mapState, mapGetters } from "vuex";
 import TopCmp from "./components/header/index";
 import SourceCmp from "./components/source/index";
 import CanvasCmp from "./components/canvas";
+import OperactionCmp from "./components/operaction";
 import cloneDeep from "lodash/cloneDeep";
 export default {
   name: "Editor",
@@ -28,7 +30,8 @@ export default {
   components: {
     TopCmp,
     SourceCmp,
-    CanvasCmp
+    CanvasCmp,
+    OperactionCmp
   },
   computed: {
     ...mapState("picture", ["currentPicture"]),
@@ -53,6 +56,14 @@ export default {
     display: flex;
     .source {
       width: 260px;
+      height: 100%;
+    }
+    .canvas-cmp-wrapper {
+      height: 100%;
+      width: 100%;
+    }
+    .opeartion-cmp {
+      width: 220px;
       height: 100%;
     }
   }

@@ -33,7 +33,7 @@ interface SourceList {
   音乐: Source[];
   音效: Source[];
 }
-export const parseSourceList = (sourceList: Source[]): SourceList => {
+const parseSourceList = (sourceList: Source[]): SourceList => {
   const result = Object.create(null);
   const source = cloneDeep(sourceList);
   const sourceMap: any = {
@@ -54,4 +54,86 @@ export const parseSourceList = (sourceList: Source[]): SourceList => {
   return result;
 };
 
-export { openSingleFileDialog };
+// JSON字符串序列化 getStringify
+const getStringify = (value: any) => {
+  try {
+    const formatValue = JSON.stringify(value);
+    return formatValue;
+  } catch {
+    return value;
+  }
+};
+// JSON获取对象 parseStringify
+const parseStringify = (value: any): string => {
+  try {
+    const formatValue = JSON.parse(value);
+    return formatValue;
+  } catch {
+    return value;
+  }
+};
+
+// 计算画布比例大小
+const getCanvasSize = (width: number, height: number) => {
+  let scaleHeight,
+    scaleWidth = width;
+  const _scale = 1440 / 2340; // 插画高比宽
+  scaleHeight = scaleWidth * _scale;
+  if (scaleHeight > height) {
+    scaleHeight = height;
+    scaleWidth = scaleWidth * (height / scaleHeight);
+  }
+  // 针对与2340的缩放比 最终缩放比例
+  const scale = 2340 / scaleWidth;
+  return {
+    scaleWidth,
+    scaleHeight,
+    scale
+  };
+};
+
+/**
+ * @param {String} url 图片url
+ * @param {number} max 最大尺寸
+ * @returns {Promise<height,width>}
+ * 根据URL获取图片尺寸并且等比例缩放尺寸
+ */
+const getPictureSize = (url: string, max = 10000): Promise<any> => {
+  const isImg = /\.(gif|jpg|jpeg|png|GIF|JPG|PNG|webp)$/.test(url);
+  if (!isImg) {
+    return Promise.resolve({ width: `${max}px`, height: `${max}px` });
+  }
+  const img = new Image();
+  img.src = url;
+  const compileSize = (width: number, height: number) => {
+    if (width > max || height > max) {
+      // 压缩尺寸
+      const scale = width > height ? width / max : height / max;
+      // return { width: width / scale, height: height / scale };
+      width = width / scale;
+      height = height / scale;
+      compileSize(width, height);
+    }
+    return { width, height };
+  };
+  return new Promise(resolve => {
+    if (img.complete) {
+      const { width, height } = compileSize(img.width, img.height);
+      resolve({ width, height });
+    } else {
+      img.onload = function() {
+        const { width, height } = compileSize(img.width, img.height);
+        resolve({ width, height });
+      };
+    }
+  });
+};
+
+export {
+  openSingleFileDialog,
+  parseSourceList,
+  getStringify,
+  parseStringify,
+  getCanvasSize,
+  getPictureSize
+};

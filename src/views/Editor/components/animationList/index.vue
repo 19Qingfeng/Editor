@@ -56,8 +56,15 @@ export default {
   methods: {
     ...mapActions("picture", ["addAnimationBook", "changeAnimationBook"]),
     // 切换插画中的绘本
-    changeBook(id) {
+    async changeBook(id) {
+      //  判断是否修改了
+      await this.$confirm("此操作将丢失未保存信息, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      });
       this.changeAnimationBook(id);
+      this.dialogVisible = false;
     },
     // 给当前绘本添加插画
     addBook() {
