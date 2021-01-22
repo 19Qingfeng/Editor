@@ -51,6 +51,14 @@ export interface Animation {
   displayTop: number;
   left: number;
   top: number;
+  originSize: {
+    displayHeight: number;
+    displayWidth: number;
+    width: number;
+    height: number;
+  };
+  readingGuide: boolean; // 点读引导
+  level: number; // 层级
   eventList: []; // 动画存在事件绑定
 }
 
@@ -65,6 +73,8 @@ export interface UpdateAnimationInfo {
   displayLeft?: number;
   displayTop?: number;
   left?: number;
+  readingGuide?: boolean; // 点读引导
   top?: number;
+  level?: number;
   eventList?: []; // 动画存在事件绑定
 }

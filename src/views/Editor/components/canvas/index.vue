@@ -10,12 +10,13 @@
       <template v-for="source in curAnimationBookSource">
         <div
           :key="source.id"
+          :class="{ 'hover-animation': curId === source.id }"
           :style="{
-            border: '1px solid red',
             width: source.displayWidth + 'px',
             height: source.displayHeight + 'px',
             top: source.displayTop + 'px',
             left: source.displayLeft + 'px',
+            zIndex: source.level,
             background: getBackgroundImage(source.path)
           }"
           draggable="true"
@@ -26,7 +27,12 @@
             }
           "
           class="single-source"
-        />
+        >
+          <template v-if="curId === source.id">
+            <div class="scale add" @click.stop="onScale(source, 'add')">+</div>
+            <div class="scale sub" @click.stop="onScale(source, 'sub')">-</div>
+          </template>
+        </div>
       </template>
     </div>
   </div>
@@ -58,6 +64,7 @@ export default {
   },
   data() {
     return {
+      curId: "", // 当前Id
       canvas: null,
       canvasLeft: 0,
       canvasTop: 0,
@@ -90,6 +97,36 @@ export default {
         })
       );
     },
+    // 缩放
+    onScale(source, type, coefficient = 0.01) {
+      const symbolType = type === "add" ? 1 : -1;
+      const {
+        id,
+        displayHeight,
+        displayWidth,
+        height,
+        width,
+        originSize: {
+          displayHeight: originDH,
+          displayWidth: orginDW,
+          height: originH,
+          width: orginW
+        }
+      } = source;
+      const scaleDisplayHeight = originDH * coefficient;
+      const scaleDisplayWidth = orginDW * coefficient;
+      const scaleHeight = originH * coefficient;
+      const scaleWidth = orginW * coefficient;
+      // 等比例进行缩放
+      const update = {
+        id,
+        displayHeight: displayHeight + symbolType * scaleDisplayHeight,
+        displayWidth: displayWidth + symbolType * scaleDisplayWidth,
+        height: height + symbolType * scaleHeight,
+        width: width + symbolType * scaleWidth
+      };
+      this.updateAnimationStyle(update);
+    },
     onDragOver(e) {
       e.preventDefault();
     },
@@ -121,6 +158,8 @@ export default {
     handleClick(source) {
       const { id } = source;
       this.changeAnimationStyle(id);
+      // 高亮当前动画
+      this.curId = id;
     },
     // 计算画布中实际的偏移量和在2340和1440映射偏移量
     getOffset(e, { offsetX, offsetY }) {
@@ -130,9 +169,6 @@ export default {
       // 映射在2340和1440的偏移量
       const top = getFormatJsonSize(displayTop, this.canvasScale);
       const left = getFormatJsonSize(displayLeft, this.canvasScale);
-      console.log(displayLeft, "displayLeft");
-      console.log(this.canvasScale, "缩放比");
-      console.log(left, "实际2340*1440尺寸");
       return {
         displayLeft,
         displayTop,
@@ -161,6 +197,8 @@ export default {
     _handleFirstAnimation(e, { id, name, path }, offset) {
       const [offsetX, offsetY] = offset;
       getPictureSize(normalizationPath(path)).then(({ height, width }) => {
+        console.log(height, "height");
+        console.log(width, "width");
         const displayHeight = getActualDisplaySize(height, this.canvasScale);
         const displayWidth = getActualDisplaySize(width, this.canvasScale);
         // 计算相对于canvas画布的实际显示偏移位置 左上角
@@ -180,6 +218,14 @@ export default {
           displayWidth,
           displayTop,
           displayLeft,
+          readingGuide: false,
+          level: 1,
+          originSize: {
+            displayHeight,
+            displayWidth,
+            width,
+            height
+          },
           eventList: [] // 初始化动画事件是空
         };
         this.addSourceToCurrentBook(source);
@@ -239,8 +285,34 @@ export default {
     margin: 0px;
     height: 100%;
     width: 100%;
+    .hover-animation {
+      outline: 1px solid red;
+    }
     .single-source {
       position: absolute;
+      .scale {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        // align-items: center;
+        line-height: 24px;
+        font-size: 20px;
+        position: absolute;
+        top: 0;
+        color: #409eff;
+        border-radius: 50%;
+      }
+      .add {
+        right: 35px;
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.6);
+      }
+      .sub {
+        right: 5px;
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.6);
+      }
     }
   }
 }
