@@ -12,7 +12,15 @@
         >
       </div>
       <section>
-        <el-button v-for="(btn, index) in btnList" :key="index">
+        <el-button
+          v-for="(btn, index) in btnList"
+          :key="index"
+          @click="
+            () => {
+              btn.on();
+            }
+          "
+        >
           {{ btn.text }}
         </el-button>
       </section>
@@ -23,7 +31,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import AnimationList from "../animationList";
 export default {
   data() {
@@ -42,7 +50,18 @@ export default {
     btnList() {
       return [
         {
-          text: "导入"
+          text: "导入",
+          on: () => {
+            console.log("导入");
+          }
+        },
+        {
+          text: "保存",
+          on: () => {
+            console.log("点击保存");
+            // 将vuex中的当前绘本信息 组合 然后推入electron-stroe
+            this.saveAnimationBook();
+          }
         },
         {
           text: "复制"
@@ -60,12 +79,18 @@ export default {
           text: "添加文本"
         },
         {
-          text: "返回"
+          text: "返回",
+          on: () => {
+            this.$router.push({
+              name: "Home"
+            });
+          }
         }
       ];
     }
   },
   methods: {
+    ...mapActions("picture", ["saveAnimationBook"]),
     // 打开绘本中的插画弹窗
     openPictureList() {
       this.isShow = true;

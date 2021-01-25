@@ -3,17 +3,17 @@ import {
   AnimationBook,
   Bg,
   Animation,
-  UpdateAnimationInfo
+  UpdateAnimationInfo,
+  Event
 } from "../../types/index";
 import cloneDeep from "lodash/cloneDeep";
 import { store } from "../../electon-store";
 import Vue from "vue";
-
 const state = {
-  pictureList: store.getPicture(), // 当前所有绘本信息
-  currentPicture: {}, // 当前正在编辑的绘本信息
+  pictureList: store.getPicture(), // 当前所有绘本信息 首页使用
+  currentPicture: {}, // 当前正在编辑的绘本信息 editor使用
   /* 当前绘本的插画信息 */
-  animationBook: {},
+  animationBook: {}, // 当前插画页
   animationBookIndex: 0,
   scale: 0, // 画布缩放比例
   /* 当前绘本当前页插画正在编辑的动画元素 */
@@ -52,6 +52,16 @@ const getters = {
   curAnimationElement: (state: any): Animation => {
     return state.animationElement;
   },
+  // 当前绘本正在编辑的插画下的正在编辑的动画元素的所有Event组合的列表
+  curAnimationEleEventList: (state: any): Event[] => {
+    const result: Event[] = [];
+    const eventObjList = state.animationElement.eventList;
+    Object.keys(eventObjList).forEach(key => {
+      const singeEventList = eventObjList[key];
+      singeEventList.forEach((i: Event) => result.push(i));
+    });
+    return result;
+  },
   // 当前画布缩放比例
   canvasScale: (state: any): number => {
     return state.scale;
@@ -59,6 +69,19 @@ const getters = {
 };
 
 const mutations = {
+  // 初始化绘本中的插画页
+  INIT_ANIMATION_BOOK(state: any) {
+    const curAnimationBookList = state.currentPicture?.animationBookList;
+    if (!curAnimationBookList?.length) {
+      state.animationBook = {};
+      state.animationBookIndex = 0;
+    } else {
+      const length = curAnimationBookList.length;
+      state.animationBookIndex = length - 1;
+      state.animationBook =
+        curAnimationBookList[curAnimationBookList.length - 1];
+    }
+  },
   ADD_PICTURE_BOOK(state: any, payload: PictureBook) {
     state.pictureList = [...state.pictureList, payload];
     store.addPicture(state.pictureList);
@@ -66,8 +89,24 @@ const mutations = {
   SET_CURRENT_PICTURE_BOOK(state: any, payload: PictureBook) {
     state.currentPicture = cloneDeep(payload);
   },
+  SAVE_ANIMATION_BOOK(state: any) {
+    // 当前绘本所有插画
+    const animationBookList: Animation[] =
+      state.currentPicture.animationBookList;
+    if (!animationBookList.length) return;
+    // 将当前绘本所有信息保存到electron-store中去
+    store.saveAnimationBookInPicture(state.currentPicture);
+    // 并且更新一下所有绘本在vuex中的值
+    state.pictureList = store.getPicture();
+    // console.log(state.currentPicture, "state.当前绘本");
+    // 将当前插画页保存到electron-store中
+    // console.log(state.animationBook, "当前插画");
+    // console.log(state.currentPicture, "当前绘本");
+  },
   ADD_ANIMATION_BOOK(state: any, book: AnimationBook) {
     state.currentPicture.animationBookList.push(book);
+    const { id } = state.currentPicture;
+    store.addAnimationBookInCurPicture(id, book);
   },
   CHANGE_ANIMATION_BOOK(state: any, id: string) {
     for (const [
@@ -75,12 +114,20 @@ const mutations = {
       book
     ] of state.currentPicture.animationBookList.entries()) {
       if (book.id === id) {
+        // 引用类型的赋值
         state.animationBook = book;
         state.animationBookIndex = index;
       }
     }
   },
   CHANGE_ANIMATION_BOOK_BG(state: any, bg: Bg) {
+    if (!bg.path) {
+      bg = {
+        id: "",
+        name: "",
+        path: ""
+      };
+    }
     Vue.set(state.animationBook, "bg", bg);
   },
   ADD_SOURCE_TO_CURRENT_BOOK(state: any, animation: Animation) {
@@ -91,13 +138,20 @@ const mutations = {
   },
   UPDATE_ANIMATION_STYLE(state: any, payload: UpdateAnimationInfo) {
     const { id, ...update } = payload;
-    const animationElement = state.animationBook.animationList.find(
+    const animationElementIndex = state.animationBook.animationList.findIndex(
       (i: Animation) => id === i.id
     );
+    const animationElement =
+      state.animationBook.animationList[animationElementIndex];
     // 更新后的值
     Object.keys(update).forEach(key => {
       animationElement[key] = update[key];
     });
+    Vue.set(
+      state.animationBook.animationList,
+      animationElementIndex,
+      animationElement
+    );
   },
   CHANGE_SCALE(state: any, scale: number) {
     state.scale = scale;
@@ -106,11 +160,42 @@ const mutations = {
     const { animationList = [] } = state.animationBook;
     const curAnimation = animationList.find((i: any) => i.id === animationId);
     state.animationElement = curAnimation;
+  },
+  UPDATE_ANIMATION_EVENT(state: any, payload: Event) {
+    const { eventList = {} } = state.animationElement;
+    const copyEventList = cloneDeep(eventList);
+    const { id, eventType, ...updateInfo } = payload;
+    // 当前eventType下的字段
+    const currentEventTypeList = copyEventList[eventType];
+    const index = currentEventTypeList.findIndex((i: Event) => i.id === id);
+    // 新建操作逻辑
+    if (index === -1) {
+      currentEventTypeList.push(payload);
+      Vue.set(state.animationElement, "eventList", copyEventList);
+      return;
+    }
+    // 更新操作逻辑
+    const updateEvent = currentEventTypeList[index];
+    Object.keys(updateInfo).forEach(key => {
+      updateEvent[key] = updateInfo[key];
+    });
+    Vue.set(state.animationElement, "eventList", copyEventList);
   }
 };
 
 const actions = {
-  // 添加绘本
+  // 关闭当前页时清空所有vuex的数据
+  clearVuex() {
+    state.animationElement = {};
+    state.scale = 0;
+    state.animationBookIndex = 0;
+    state.animationBook = {};
+    state.currentPicture = {};
+  },
+  // 初始化绘本 当前页
+  initAnimationBook({ commit }: any) {
+    commit("INIT_ANIMATION_BOOK");
+  }, // 添加绘本
   addPictureBook({ commit }: any, pictureBook: PictureBook): void {
     commit("ADD_PICTURE_BOOK", cloneDeep(pictureBook));
   },
@@ -120,6 +205,10 @@ const actions = {
       (book: PictureBook) => book.id === id
     );
     commit("SET_CURRENT_PICTURE_BOOK", currentPicture);
+  },
+  // 保存当前插画页进入当前绘本并且推入electron-store
+  saveAnimationBook({ commit }: any) {
+    commit("SAVE_ANIMATION_BOOK");
   },
   // 当前绘本下添加插画
   addAnimationBook({ commit }: any, book: AnimationBook) {
@@ -144,6 +233,11 @@ const actions = {
   // 更新当前插画下动画元素信息(位置，事件。。直接覆盖)
   updateAnimationStyle({ commit }: any, payload: UpdateAnimationInfo): any {
     commit("UPDATE_ANIMATION_STYLE", payload);
+  },
+  // 为当前插画下的动画元素增加事件/修改事件
+  updateAnimationEvent({ commit }: any, payload: Event) {
+    // nothing
+    commit("UPDATE_ANIMATION_EVENT", payload);
   },
   // 绘本canvas缩放比例
   changeScale({ commit }: any, scale: number) {

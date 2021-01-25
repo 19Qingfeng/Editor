@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
+import { mapState, mapGetters, mapActions } from "vuex";
 import TopCmp from "./components/header/index";
 import SourceCmp from "./components/source/index";
 import CanvasCmp from "./components/canvas";
@@ -38,9 +38,20 @@ export default {
     ...mapGetters("picture", ["sourceList"])
   },
   methods: {
+    ...mapActions("picture", [
+      "initAnimationBook",
+      "updatePicutreList",
+      "clearVuex"
+    ]),
     getSourceList() {
       return cloneDeep(this.sourceList);
     }
+  },
+  beforeDestroy() {
+    this.clearVuex();
+  },
+  created() {
+    this.initAnimationBook();
   }
 };
 </script>

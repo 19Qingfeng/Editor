@@ -14,9 +14,11 @@
           v-for="opearction in opearList"
           :key="opearction.value"
           :label="opearction.label"
+          :value="opearction.value"
         />
       </el-select>
       <el-button
+        class="btn"
         type="primary"
         size="mini"
         @click="addInteractive"
@@ -26,7 +28,7 @@
       </el-button>
     </div>
 
-    <drawer-cmp :isShow.sync="isShow" />
+    <drawer-cmp v-if="isShow" :isShow.sync="isShow" :eventType="opearType" />
   </div>
 </template>
 
@@ -47,7 +49,15 @@ export default {
       opearList: [
         {
           label: "点击",
-          value: 1
+          value: "click"
+        },
+        {
+          label: "自动",
+          value: "auto"
+        },
+        {
+          label: "动画完成",
+          value: "animactionComplete"
         }
       ]
     };
@@ -65,7 +75,6 @@ export default {
   methods: {
     addInteractive() {
       this.isShow = true;
-      console.log("交互");
     }
   }
 };
@@ -89,6 +98,10 @@ export default {
     .add-select {
       width: 80%;
       margin: 10px;
+    }
+    .btn {
+      width: 80%;
+      margin: 0 auto;
     }
   }
 }

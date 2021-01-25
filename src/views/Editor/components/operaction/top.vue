@@ -1,7 +1,7 @@
 <template>
   <div class="opearion-wrapper">
     <div class="header">
-      <title-cmp :title="title" :btnList="btnList" />
+      <title-cmp :title="title" />
     </div>
     <template v-if="hasCurAnimation">
       <div class="opearion-inner-wrapper">
@@ -20,10 +20,17 @@
             <template slot="append">{{ key }}</template>
           </el-input>
         </div>
+        <div class="first-animation">
+          <el-input
+            v-model="firstAnimation"
+            size="mini"
+            placeholder="first animation"
+          />
+        </div>
       </div>
     </template>
 
-    <section class="opearion-bottom-wrapper">
+    <section v-if="hasCurAnimation" class="opearion-bottom-wrapper">
       <div class="level">
         <span class="title">层级:</span>
         <el-select v-model="level" placeholder="输入层级" size="mini">
@@ -73,6 +80,18 @@ export default {
     },
     showTop() {
       return this.curAnimationElement.top;
+    },
+    // 首次播放动画
+    firstAnimation: {
+      get() {
+        return this.curAnimationElement.firstAnimation;
+      },
+      set(val) {
+        this.updateAnimationStyle({
+          id: this.animationId,
+          firstAnimation: val
+        });
+      }
     },
     // 当前动画ID
     animationId() {
@@ -172,6 +191,15 @@ export default {
     .name {
       height: 40px;
       line-height: 40px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .first-animation {
+      margin: 5px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
   .opearion-bottom-wrapper {

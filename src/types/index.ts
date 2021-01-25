@@ -57,9 +57,10 @@ export interface Animation {
     width: number;
     height: number;
   };
+  firstAnimation: string; // 默认第一次播放的动画
   readingGuide: boolean; // 点读引导
   level: number; // 层级
-  eventList: []; // 动画存在事件绑定
+  eventList: Event[]; // 动画存在事件绑定
 }
 
 // 需要更新的当前绘本中动画元素的信息
@@ -75,6 +76,40 @@ export interface UpdateAnimationInfo {
   left?: number;
   readingGuide?: boolean; // 点读引导
   top?: number;
+  firstAnimation?: string;
   level?: number;
-  eventList?: []; // 动画存在事件绑定
+  // eventList?: Event[]; // 动画存在事件绑定
+  eventList?: {
+    auto: Event[];
+    click: Event[];
+    animactionComplete: Event[];
+  };
+}
+
+// 动画元素存在绑定的事件列表
+export interface Event {
+  [propName: string]: any;
+  id: string;
+  eventType: "auto" | "click" | "animactionComplete";
+  type:
+    | "playAnimation" // 播放动画
+    | "stopAnimation" // 暂停动画
+    | "sound" // 配音
+    | "transform" // 变换
+    | "text" // 文本
+    | "bgSound" // 背景音乐
+    | "effectSound"; // 播放音效
+  target?: string; // 目标动画ID
+  playSound?: string; // 音频/音乐/背景的key
+  delay?: number;
+  position?: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  };
+  level?: number;
+  loop?: boolean;
+  textBefore?: string;
+  textAfter?: string;
 }

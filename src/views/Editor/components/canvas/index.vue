@@ -7,6 +7,7 @@
       @dragover="onDragOver"
       :style="{ background: bgImage }"
     >
+      {{ animationBook }}
       <template v-for="source in curAnimationBookSource">
         <div
           :key="source.id"
@@ -39,7 +40,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapState } from "vuex";
 import { basename, extname } from "path";
 import {
   getActualDisplaySize,
@@ -56,11 +57,22 @@ import {
 
 export default {
   computed: {
+    ...mapState("picture", ["animationBook"]),
     ...mapGetters("picture", [
       "curAnimationBook",
       "canvasScale",
-      "curAnimationBookSource"
+      "curAnimationBookSource",
+      "curAnimationEleEventList"
     ])
+  },
+  watch: {
+    curAnimationBook: {
+      immediate: true,
+      handler(n) {
+        const { bg } = n;
+        this.hanldeBgPng(bg);
+      }
+    }
   },
   data() {
     return {
@@ -81,6 +93,7 @@ export default {
       "updateAnimationStyle"
     ]),
     getBackgroundImage(path) {
+      if (!path) return "";
       return `url(${normalizationPath(path)}) center / 100% 100%`;
     },
     onDragStart(e, source) {
@@ -220,13 +233,19 @@ export default {
           displayLeft,
           readingGuide: false,
           level: 1,
+          firstAnimation: "", // 只有flr有 等待处理
           originSize: {
             displayHeight,
             displayWidth,
             width,
             height
           },
-          eventList: [] // 初始化动画事件是空
+          // eventList: [] // 初始化动画事件是空 修改初始化的EventList 是Object而非Array
+          eventList: {
+            auto: [],
+            click: [],
+            animactionComplete: []
+          }
         };
         this.addSourceToCurrentBook(source);
       });

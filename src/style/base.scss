@@ -6,3 +6,39 @@ body,
 div {
   font-size: 12px;
 }
+
+.clearfix:after {
+  content: " ";
+
+  display: block;
+
+  clear: both;
+
+  height: 0;
+}
+
+.clearfix {
+  zoom: 1;
+}
+
+// Event操作框
+.event-base {
+  box-sizing: border-box;
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  .btn-wrapper {
+    // float: right;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .event-type {
+      margin-left: 20px;
+    }
+  }
+  .event-wrapper {
+    .el-select {
+      width: 175px;
+    }
+  }
+}

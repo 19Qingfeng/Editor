@@ -66,12 +66,12 @@ export default {
       this.changeAnimationBook(id);
       this.dialogVisible = false;
     },
-    // 给当前绘本添加插画
+    // 给当前绘本添加插画页
     addBook() {
       const book = {
         id: v4(),
         bg: "",
-        animationBookList: [],
+        animationList: [], // 添加一页插画这是什么东西？ 这不对吧
         text: []
       };
       this.addAnimationBook(book);
