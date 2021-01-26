@@ -120,15 +120,26 @@ const mutations = {
       }
     }
   },
-  CHANGE_ANIMATION_BOOK_BG(state: any, bg: Bg) {
-    if (!bg.path) {
-      bg = {
-        id: "",
-        name: "",
-        path: ""
-      };
+  CHANGE_ANIMATION_BOOK_BG(state: any, bg: Bg | undefined) {
+    if (bg?.path) {
+      bg = undefined;
+      // {
+      //   id: v4(),
+      //   name: "",
+      //   path: ""
+      // };
     }
     Vue.set(state.animationBook, "bg", bg);
+  },
+  DELETE_SOURCE_TO_CURRENT_BOOK(state: any, animation: Animation) {
+    // 找到id 直接splice变异方法进行删除就OK了
+    const { id } = animation;
+    const index = state.animationBook.animationList.findIndex(
+      (i: Animation) => i.id === id
+    );
+    if (index !== -1) {
+      state.animationBook.animationList.splice(index, 1);
+    }
   },
   ADD_SOURCE_TO_CURRENT_BOOK(state: any, animation: Animation) {
     if (!state.animationBook.animationList) {
@@ -136,6 +147,7 @@ const mutations = {
     }
     state.animationBook.animationList.push(animation);
   },
+  //
   UPDATE_ANIMATION_STYLE(state: any, payload: UpdateAnimationInfo) {
     const { id, ...update } = payload;
     const animationElementIndex = state.animationBook.animationList.findIndex(
@@ -195,6 +207,7 @@ const actions = {
   // 初始化绘本 当前页
   initAnimationBook({ commit }: any) {
     commit("INIT_ANIMATION_BOOK");
+    // 初始化
   }, // 添加绘本
   addPictureBook({ commit }: any, pictureBook: PictureBook): void {
     commit("ADD_PICTURE_BOOK", cloneDeep(pictureBook));
@@ -219,12 +232,16 @@ const actions = {
     commit("CHANGE_ANIMATION_BOOK", id);
   },
   // 修改绘本当前页背景图
-  changeAnimationBookBg({ commit }: any, bg: Bg) {
+  changeAnimationBookBg({ commit }: any, bg: Bg | undefined) {
     commit("CHANGE_ANIMATION_BOOK_BG", bg);
   },
   // 添加绘本当前插画页的资源
   addSourceToCurrentBook({ commit }: any, payload: any) {
     commit("ADD_SOURCE_TO_CURRENT_BOOK", payload);
+  },
+  // 删除绘本当前页的资源
+  deleteSourceToCurrentBook({ commit }: any, payload: any) {
+    commit("DELETE_SOURCE_TO_CURRENT_BOOK", payload);
   },
   // 点击切换当前插画页的动画(事件，音乐xxx之类)
   changeAnimationStyle({ commit }: any, animationId: number) {

@@ -7,7 +7,6 @@
       @dragover="onDragOver"
       :style="{ background: bgImage }"
     >
-      {{ animationBook }}
       <template v-for="source in curAnimationBookSource">
         <div
           :key="source.id"
@@ -42,6 +41,7 @@
 <script>
 import { mapGetters, mapActions, mapState } from "vuex";
 import { basename, extname } from "path";
+import debounce from "lodash/debounce";
 import {
   getActualDisplaySize,
   getOffsetSize,
@@ -59,18 +59,18 @@ export default {
   computed: {
     ...mapState("picture", ["animationBook"]),
     ...mapGetters("picture", [
+      "animationBookList",
       "curAnimationBook",
       "canvasScale",
+      "curAnimationBookBg",
       "curAnimationBookSource",
       "curAnimationEleEventList"
     ])
   },
   watch: {
-    curAnimationBook: {
-      immediate: true,
-      handler(n) {
-        const { bg } = n;
-        this.hanldeBgPng(bg);
+    "curAnimationBook.bg": {
+      handler(bg) {
+        if (!bg) this.bgImage = "";
       }
     }
   },
@@ -252,7 +252,6 @@ export default {
     },
     // 处理背景图
     hanldeBgPng({ id, name, path }) {
-      // this.bgImage = `url(${normalizationPath(path)}) center / 100% 100%`;
       this.bgImage = this.getBackgroundImage(path);
       // 绘本当前页添加资源
       this.changeAnimationBookBg({
@@ -261,6 +260,7 @@ export default {
         path
       });
     },
+
     // 初始化画布大小
     initCanvasSize() {
       const el = this.$refs["canvasWrapper"];
@@ -273,6 +273,7 @@ export default {
         offsetHeight
       );
       this.changeScale(scale);
+      console.log(scale, "scale");
       console.log("针对2340*1440尺寸下的最终映射比例", scale);
       canvas.style.height = `${scaleHeight}px`;
       canvas.style.width = `${scaleWidth}px`;
@@ -281,11 +282,32 @@ export default {
         this.canvasLeft = x;
         this.canvasTop = y;
       });
+    },
+
+    // 窗口缩放事件
+    scaleEvent: debounce(function() {
+      // 重新初始化画布大小
+      this.initCanvasSize();
+      // 缩放比计算有问题
+    }, 200),
+
+    // 监听大小缩放事件
+    initScaleEvent() {
+      window.addEventListener("resize", this.scaleEvent);
     }
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.scaleEvent);
+  },
+  created() {
+    const { path } = this.curAnimationBookBg;
+    this.bgImage = this.getBackgroundImage(path);
   },
   mounted() {
     this.canvas = this.$refs["canvas"];
     this.initCanvasSize();
+    this.initScaleEvent();
+    // initCanvasSize
   }
 };
 </script>

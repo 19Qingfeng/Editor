@@ -7,18 +7,37 @@
       <!-- 背景资源 -->
       <div v-if="hasBg">
         <div class="title">背景</div>
-        <div class="source">{{ hasBg.name }}</div>
+
+        <el-popover placement="right" width="200" trigger="hover">
+          <el-button size="mini" type="danger" @click="handleRemoveBg"
+            >删除</el-button
+          >
+          <div slot="reference" class="source">
+            {{ hasBg.name }}
+          </div>
+        </el-popover>
       </div>
       <!-- 动画资源 -->
       <div v-if="hasAnimation">
         <div class="title">动画</div>
-        <div
-          class="source"
+
+        <el-popover
           v-for="animation in curAnimationBookSource"
           :key="animation.id"
+          placement="right"
+          width="200"
+          trigger="hover"
         >
-          {{ animation.name }}
-        </div>
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleRemoveAnimation(animation)"
+            >删除</el-button
+          >
+          <div class="source" slot="reference">
+            {{ animation.name }}
+          </div>
+        </el-popover>
       </div>
     </div>
   </div>
@@ -26,7 +45,8 @@
 
 <script>
 import TitleCmp from "@/components/TitleHeader";
-import { mapGetters } from "vuex";
+import { v4 } from "uuid";
+import { mapActions, mapGetters } from "vuex";
 export default {
   components: {
     TitleCmp
@@ -58,6 +78,20 @@ export default {
         }
       ]
     };
+  },
+  methods: {
+    ...mapActions("picture", [
+      "changeAnimationBookBg",
+      "deleteSourceToCurrentBook"
+    ]),
+    handleRemoveBg() {
+      this.changeAnimationBookBg();
+    },
+    handleRemoveAnimation(animation) {
+      this.deleteSourceToCurrentBook(animation);
+      console.log(animation, "animation");
+      // 删除动画元素 同理 删除vuex中的动画元素就好了
+    }
   }
 };
 </script>

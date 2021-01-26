@@ -24,6 +24,23 @@
           {{ btn.text }}
         </el-button>
       </section>
+
+      <section class="music-warpper" v-show="videoName !== ''">
+        <div class="name">{{ videoName }}</div>
+        <div class="progress">
+          <el-progress
+            :text-inside="true"
+            :stroke-width="12"
+            :percentage="speedProcess"
+            status="success"
+            size="mini"
+          ></el-progress>
+        </div>
+        <div
+          class="stop-music iconfont icon-tingzhi"
+          @click="handleStopMusic"
+        ></div>
+      </section>
     </div>
 
     <animation-list v-if="isShow" :is-show.sync="isShow" />
@@ -31,7 +48,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import AnimationList from "../animationList";
 export default {
   data() {
@@ -44,6 +61,13 @@ export default {
   },
   computed: {
     ...mapGetters("picture", ["curAnimationBookIndex"]),
+    ...mapGetters("music", ["speedProcess"]),
+    ...mapState("music", [
+      "video",
+      "videoDuration",
+      "videoCurrentTime",
+      "videoName"
+    ]),
     Sp() {
       return `SP${this.curAnimationBookIndex * 1 + 1}`;
     },
@@ -91,9 +115,14 @@ export default {
   },
   methods: {
     ...mapActions("picture", ["saveAnimationBook"]),
+    ...mapActions("music", ["hanldeStopMusic"]),
     // 打开绘本中的插画弹窗
     openPictureList() {
       this.isShow = true;
+    },
+    // 停止音乐
+    handleStopMusic() {
+      this.hanldeStopMusic();
     }
   }
 };
@@ -104,6 +133,7 @@ export default {
   height: 100%;
   box-sizing: border-box;
   padding-left: 20px;
+  position: relative;
   .header {
     height: 20px;
     display: flex;
@@ -118,6 +148,27 @@ export default {
       justify-content: center;
       align-items: center;
       margin: 0 20px 0 0;
+    }
+  }
+  .music-warpper {
+    display: flex;
+    position: absolute;
+    right: 20px;
+    width: 300px;
+    align-items: center;
+    .name {
+      margin-right: 10px;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .progress {
+      flex: 1;
+    }
+    .stop-music {
+      color: #000;
+      font-weight: 600;
+      margin-left: 6px;
     }
   }
   background: $bg-primary;

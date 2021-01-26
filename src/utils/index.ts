@@ -83,7 +83,7 @@ const getCanvasSize = (width: number, height: number) => {
     scaleHeight = height;
     scaleWidth = scaleWidth * (height / scaleHeight);
   }
-  // 针对与2340的缩放比 最终缩放比例
+  // 针对与2340的缩放比 最终缩放比例 这是宽度缩放比例
   const scale = 2340 / scaleWidth;
   return {
     scaleWidth,

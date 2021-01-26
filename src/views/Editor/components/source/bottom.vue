@@ -6,16 +6,42 @@
     <div class="source-list">
       <div v-for="(value, key) in formatSourceList" :key="key">
         <div class="title">{{ key }}</div>
-        <div
-          class="source"
-          v-for="item in value"
-          :key="item.id"
-          :data-source="saveDataset(item)"
-          @dragstart="onDragStart"
-          draggable="true"
-        >
-          {{ item.name }}
-        </div>
+
+        <template v-for="item in value">
+          <!-- 音乐可以播放 -->
+          <el-popover
+            placement="right"
+            width="60"
+            trigger="hover"
+            :key="item.id"
+            v-if="isMusic(item)"
+          >
+            <el-button @click="handlePlayMusic(item)" type="success"
+              >播放</el-button
+            >
+            <div
+              class="source"
+              slot="reference"
+              :data-source="saveDataset(item)"
+              @dragstart="onDragStart"
+              draggable="true"
+            >
+              {{ item.name }}
+            </div>
+          </el-popover>
+
+          <!-- 没有弹出框 -->
+          <div
+            v-else
+            class="source"
+            :key="item.id"
+            :data-source="saveDataset(item)"
+            @dragstart="onDragStart"
+            draggable="true"
+          >
+            {{ item.name }}
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -23,7 +49,13 @@
 
 <script>
 import TitleCmp from "@/components/TitleHeader";
-import { parseSourceList, getStringify } from "@/utils/index";
+import {
+  parseSourceList,
+  getStringify,
+  normalizationPath
+} from "@/utils/index";
+import path from "path";
+import { mapActions, mapState } from "vuex";
 export default {
   components: {
     TitleCmp
@@ -47,12 +79,32 @@ export default {
   created() {
     this.initSourceList();
   },
+  computed: {
+    ...mapState("music", ["video"]),
+    sourceList() {
+      return this.getSourceList();
+    }
+  },
   methods: {
+    ...mapActions("music", ["handleChangeVideo"]),
     initSourceList() {
       this.formatSourceList = parseSourceList(this.sourceList);
     },
     saveDataset(value) {
       return getStringify(value);
+    },
+    // 播放音乐
+    handlePlayMusic(item) {
+      // 操作video就可以啦
+      const { path, name } = item;
+      this.handleChangeVideo({ path: normalizationPath(path), name });
+    },
+    // 判断是否是音乐 是否可以播放
+    isMusic(item) {
+      const { name } = item;
+      const extName = path.extname(name);
+      const musicList = [".mp3", ".wav"];
+      return musicList.includes(extName);
     },
     // 拖拽开始
     onDragStart(e) {
@@ -68,11 +120,6 @@ export default {
           y: 0
         })
       );
-    }
-  },
-  computed: {
-    sourceList() {
-      return this.getSourceList();
     }
   }
 };
