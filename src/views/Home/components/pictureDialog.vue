@@ -93,6 +93,7 @@ import { PictureBook, BaseInfo, Source } from "../../../types/index";
 import { ipcRenderer } from "electron";
 import { basename } from "path";
 import { v4 } from "uuid";
+import { parseExceltoJson } from "../../../utils/excel";
 import { getAllSourcePath } from "../../../utils/zip";
 import Component from "vue-class-component";
 
@@ -209,6 +210,7 @@ export default class PictureDialog extends GreetingProps {
   uploadZipSuccess({ filePath, originPath }: any): void {
     this.zipPath = filePath;
     this.originZipPath = originPath;
+    // 解压之后
   }
   handleClose(): void {
     this.dialogVisible = false;
@@ -219,7 +221,20 @@ export default class PictureDialog extends GreetingProps {
   onUploadZip() {
     ipcRenderer.send("on-upload-zip");
   }
-  getParams(sourceList: Source[]): PictureBook {
+  initWordListByXlsx(sourceList: Source[]): { data: any; output: string } {
+    // 拿到所有的source然后查找是否name是xlsl结尾的文件
+    // 如果存在格式化成json然后保存在本地
+    const xlsl = sourceList.find((source: Source) => {
+      return source.name.endsWith(".xlsx");
+    });
+    const obj: { data: any; output: string } = parseExceltoJson(xlsl);
+    return obj;
+    // 不是则给sourceList什么都不操作
+  }
+  getParams(
+    sourceList: Source[],
+    { data, output }: { data: any; output: string }
+  ): PictureBook {
     const { name, author, tag, age, category, preview, guidance } = this.form;
     const baseInfo: BaseInfo = {
       name,
@@ -238,6 +253,8 @@ export default class PictureDialog extends GreetingProps {
       cover,
       sourceList,
       zip,
+      wordPath: output,
+      wordList: data,
       animationBookList: []
     };
   }
@@ -249,12 +266,14 @@ export default class PictureDialog extends GreetingProps {
       this.loading = true;
       await (this.$refs["form"] as any).validate();
       const sourceList: Source[] = await getAllSourcePath(this.originZipPath);
-      const params = this.getParams(sourceList);
+      // 解析excel生成json保存在当前路径下
+      const wordObj = this.initWordListByXlsx(sourceList);
+      const params = this.getParams(sourceList, wordObj);
       // 接下来就应该保存当前绘本信息
       this.onSavePicture(params);
+      console.log(params, "params");
       this.dialogVisible = false;
     } catch (err) {
-      console.log(err);
       this.loading = false;
     }
   }

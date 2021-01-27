@@ -3,6 +3,8 @@ const getActualDisplaySize = (size: number, scale: number): number => {
   return size / scale;
 };
 
+// scale不对
+
 // 获得显示的JSON尺寸
 const getFormatJsonSize = (size: number, scale: number): number => {
   // return size * scale;

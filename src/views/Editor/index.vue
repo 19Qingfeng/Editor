@@ -24,7 +24,8 @@ export default {
   name: "Editor",
   provide() {
     return {
-      getSourceList: this.getSourceList
+      getSourceList: this.getSourceList,
+      getWordList: this.getWordList
     };
   },
   components: {
@@ -35,7 +36,7 @@ export default {
   },
   computed: {
     ...mapState("picture", ["currentPicture"]),
-    ...mapGetters("picture", ["sourceList"])
+    ...mapGetters("picture", ["sourceList", "wordSourceList"])
   },
   methods: {
     ...mapActions("picture", [
@@ -45,6 +46,9 @@ export default {
     ]),
     getSourceList() {
       return cloneDeep(this.sourceList);
+    },
+    getWordList() {
+      return cloneDeep(this.wordSourceList);
     }
   },
   beforeDestroy() {

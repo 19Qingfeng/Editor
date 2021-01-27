@@ -21,6 +21,8 @@ export interface PictureBook {
   baseInfo: BaseInfo;
   cover: string; // cover本地路径
   zip: string; // zip非本地路径 无所谓
+  wordPath: string; // 解析文字excel后的Json文件路径
+  wordList: any; // 其实就是wordJson的值，持久化保存起来就不用再次读json了
   sourceList: Source[];
   animationBookList: AnimationBook[]; // 插画信息
 }

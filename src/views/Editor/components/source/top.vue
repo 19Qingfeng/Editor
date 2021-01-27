@@ -45,7 +45,6 @@
 
 <script>
 import TitleCmp from "@/components/TitleHeader";
-import { v4 } from "uuid";
 import { mapActions, mapGetters } from "vuex";
 export default {
   components: {

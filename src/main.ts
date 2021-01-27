@@ -1,6 +1,6 @@
 import Vue from "vue";
 import App from "./App.vue";
-import "./registerServiceWorker";
+// import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
 import ElementUI from "element-ui";
@@ -11,11 +11,11 @@ import "./style/index.scss";
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI, {
-  size: "mini",
+  size: "mini"
 });
 new Vue({
   router,
   store,
   // vuetify,
-  render: (h) => h(App),
+  render: h => h(App)
 }).$mount("#app");

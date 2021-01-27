@@ -59,7 +59,8 @@ export default {
   computed: {
     ...mapGetters("picture", [
       "curAnimationElement",
-      "canvasScale",
+      "canvasWidthScale",
+      "canvasHeightScale",
       "curAnimationElement"
     ]),
     hasCurAnimation() {
@@ -141,23 +142,28 @@ export default {
       const mapKey = {
         x: {
           key: "left",
-          realKey: "displayLeft"
+          realKey: "displayLeft",
+          // 应该是使用x轴的缩放
+          scale: "canvasWidthScale"
         },
         y: {
           key: "top",
-          realKey: "displayTop"
+          realKey: "displayTop",
+          scale: "canvasHeightScale"
         },
         w: {
           key: "width",
-          realKey: "displayWidth"
+          realKey: "displayWidth",
+          scale: "canvasWidthScale"
         },
         h: {
           key: "height",
-          realKey: "displayHeight"
+          realKey: "displayHeight",
+          scale: "canvasHeightScale"
         }
       };
-      const { key, realKey } = mapKey[styleKey];
-      const realValue = getActualDisplaySize(styleValue, this.canvasScale);
+      const { key, realKey, scale } = mapKey[styleKey];
+      const realValue = getActualDisplaySize(styleValue, this[scale]);
       // 需要改变的是
       const updateInfo = {
         id: this.animationId,

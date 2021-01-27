@@ -12,21 +12,40 @@ import Vue from "vue";
 const state = {
   pictureList: store.getPicture(), // 当前所有绘本信息 首页使用
   currentPicture: {}, // 当前正在编辑的绘本信息 editor使用
+  wordList: {}, //当前绘本中所有的文字资源
   /* 当前绘本的插画信息 */
   animationBook: {}, // 当前插画页
   animationBookIndex: 0,
-  scale: 0, // 画布缩放比例
+  widthScale: 0, // 画布宽度缩放比例
+  heightScale: 0, // 画布高度缩放比例
   /* 当前绘本当前页插画正在编辑的动画元素 */
   animationElement: {}
 };
 
 const getters = {
+  // 绘本内所有的资源(不包含文字 文字需要单独解析)
   sourceList: (state: any) => {
     return state.currentPicture.sourceList;
   },
   // 绘本存在的插画长度
   animationBookLength: (state: any) => {
     return state.currentPicture.animationBookList.length;
+  },
+  // 绘本的所有文字资源(格式化后的)
+  wordSourceList: (
+    state: any
+  ): { id: string; name: string; type: string }[] => {
+    const result: { id: string; name: string; type: string }[] = [];
+    const { wordList } = state;
+    Object.keys(wordList).forEach(id => {
+      const text = wordList[id];
+      result.push({
+        id,
+        type: "text",
+        name: text
+      });
+    });
+    return result;
   },
   // 获取所有插画信息
   animationBookList: (state: any) => {
@@ -62,9 +81,13 @@ const getters = {
     });
     return result;
   },
-  // 当前画布缩放比例
-  canvasScale: (state: any): number => {
-    return state.scale;
+  // 当前画布宽度缩放比例
+  canvasWidthScale: (state: any): number => {
+    return state.widthScale;
+  },
+  // 当前画布高度缩放比例
+  canvasHeightScale: (state: any): number => {
+    return state.heightScale;
   }
 };
 
@@ -121,7 +144,7 @@ const mutations = {
     }
   },
   CHANGE_ANIMATION_BOOK_BG(state: any, bg: Bg | undefined) {
-    if (bg?.path) {
+    if (!bg?.path) {
       bg = undefined;
       // {
       //   id: v4(),
@@ -165,8 +188,30 @@ const mutations = {
       animationElement
     );
   },
-  CHANGE_SCALE(state: any, scale: number) {
-    state.scale = scale;
+  CHANGE_SCALE(state: any, { widthScale, heightScale }: any) {
+    state.widthScale = widthScale;
+    state.heightScale = heightScale;
+  },
+  UPDATE_ANIMATION_SIZE(state: any) {
+    /* eslint-disable */
+    const {
+      widthScale,
+      heightScale,
+      animationBook: { animationList = [] },
+    } = state;
+    // 获取当前插画页所有动画资源
+    if (animationList.length === 0) return;
+    // 更新位置/大小信息 仅仅对于画布中出现的动画做了处理 没有处理图片
+    const updateAnimationBook = animationList.map((i: Animation) => {
+      return {
+        ...i,
+        displayHeight: i.height / heightScale,
+        displayLeft: i.left / widthScale,
+        displayTop: i.top / heightScale,
+        displayWidth: i.width / widthScale,
+      };
+    });
+    Vue.set(state.animationBook, "animationList", updateAnimationBook);
   },
   CHANGE_ANIMATION_STYLE(state: any, animationId: any) {
     const { animationList = [] } = state.animationBook;
@@ -188,18 +233,19 @@ const mutations = {
     }
     // 更新操作逻辑
     const updateEvent = currentEventTypeList[index];
-    Object.keys(updateInfo).forEach(key => {
+    Object.keys(updateInfo).forEach((key) => {
       updateEvent[key] = updateInfo[key];
     });
     Vue.set(state.animationElement, "eventList", copyEventList);
-  }
+  },
 };
 
 const actions = {
   // 关闭当前页时清空所有vuex的数据
   clearVuex() {
     state.animationElement = {};
-    state.scale = 0;
+    state.widthScale = 0;
+    state.heightScale = 0;
     state.animationBookIndex = 0;
     state.animationBook = {};
     state.currentPicture = {};
@@ -217,7 +263,14 @@ const actions = {
     const currentPicture = state.pictureList.find(
       (book: PictureBook) => book.id === id
     );
+    // 根据ID解析出来后 取到当前绘本内word文件目录 然后读对应json 然后进行处理
     commit("SET_CURRENT_PICTURE_BOOK", currentPicture);
+
+    const wordList = currentPicture.wordList["Zh-ch"];
+    if (wordList) {
+      state.wordList = wordList;
+    }
+    console.log(currentPicture, "当前绘本");
   },
   // 保存当前插画页进入当前绘本并且推入electron-store
   saveAnimationBook({ commit }: any) {
@@ -257,9 +310,13 @@ const actions = {
     commit("UPDATE_ANIMATION_EVENT", payload);
   },
   // 绘本canvas缩放比例
-  changeScale({ commit }: any, scale: number) {
-    commit("CHANGE_SCALE", scale);
-  }
+  changeScale({ commit }: any, { widthScale, heightScale }: any) {
+    commit("CHANGE_SCALE", { widthScale, heightScale });
+  },
+  // 当前插画中所有元素的比例进行处理(当窗口改变时 动画元素宽高/位移需要按比例刷新)
+  updateAnimationSize({ commit }: any) {
+    commit("UPDATE_ANIMATION_SIZE");
+  },
 };
 
 export default {
@@ -267,5 +324,5 @@ export default {
   state,
   getters,
   mutations,
-  actions
+  actions,
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="event-base event-music">
+  <div class="event-base">
     <div class="edit-btn clearfix">
       <div class="btn-wrapper">
         <div class="event-type">{{ parseEventType(eventType) }}</div>
@@ -17,11 +17,10 @@
       ></el-input>
     </div>
     <div class="event-wrapper">
-      <div class="title">配音:</div>
-      <el-select size="mini" v-model="curPlaySound">
-        <!-- 这里应该取资源库中所有的mp3形式的 -->
+      <div class="title">更新文本:</div>
+      <el-select size="mini" v-model="curTarget">
         <el-option
-          v-for="source in musicSourceList"
+          v-for="source in curAnimationBookSource"
           :key="source.id"
           :value="source.id"
           :label="source.name"
@@ -36,10 +35,6 @@
         </template>
       </el-input>
     </div>
-    <div class="event-wrapper loop-play">
-      <div class="title">循环播放</div>
-      <el-checkbox v-model="curLoop" />
-    </div>
   </div>
 </template>
 
@@ -49,8 +44,9 @@ export default {
   mixins: [CommonMixins]
 };
 </script>
+
 <style lang="scss" scoped>
-.event-music {
+.event-base {
   .event-wrapper {
     display: flex;
     margin: 5px 0;
@@ -59,11 +55,6 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-  }
-  .loop-play {
-    .title {
-      margin-right: 5px;
     }
   }
 }

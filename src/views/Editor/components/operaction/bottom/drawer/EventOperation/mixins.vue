@@ -1,5 +1,6 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
+import path from "path";
 import cloneDeep from "lodash/cloneDeep";
 export default {
   props: {
@@ -20,11 +21,18 @@ export default {
     // 获取当前所有的动画元素 自己选吧
     ...mapGetters("picture", [
       "curAnimationBookSource",
+      "sourceList", // 所有资源
       "curAnimationEleEventList"
     ]),
     // 当前操作的事件对象
     curEvent() {
       return this.curAnimationEleEventList.find(i => i.id === this.id);
+    },
+    // 所有音乐/音频文件
+    musicSourceList() {
+      return this.sourceList.filter(i => {
+        return [".mp3", ".wav"].includes(path.extname(i.name));
+      });
     },
     // 目标元素
     curTarget: {

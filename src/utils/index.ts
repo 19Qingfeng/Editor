@@ -33,15 +33,25 @@ interface SourceList {
   音乐: Source[];
   音效: Source[];
 }
-const parseSourceList = (sourceList: Source[]): SourceList => {
+
+interface Word {
+  type: "text";
+  name: string;
+  id: string;
+}
+
+const parseSourceList = (
+  sourceList: Source[],
+  wordList: Word[]
+): SourceList => {
   const result = Object.create(null);
   const source = cloneDeep(sourceList);
   const sourceMap: any = {
     webp: "图片",
-    docx: "文字先留着",
     mp3: "音乐",
     wav: "音效"
   };
+  // 添加了所有的图片和音乐以及音效
   source.forEach(file => {
     const { name } = file;
     const extName = path.extname(name).replace(".", "");
@@ -50,6 +60,11 @@ const parseSourceList = (sourceList: Source[]): SourceList => {
       result[sourceMap[extName]] = [];
     }
     result[sourceMap[extName]].push(file);
+  });
+  // 文字是额外解析的 所以文字额外添加
+  wordList.forEach((word: Word) => {
+    if (!result["文字"]) result["文字"] = [];
+    result["文字"].push(word);
   });
   return result;
 };
@@ -83,12 +98,14 @@ const getCanvasSize = (width: number, height: number) => {
     scaleHeight = height;
     scaleWidth = scaleWidth * (height / scaleHeight);
   }
-  // 针对与2340的缩放比 最终缩放比例 这是宽度缩放比例
-  const scale = 2340 / scaleWidth;
+  // 针对与2340的缩放比 最终缩放比例
+  const widthScale = 2340 / scaleWidth; // 宽度缩放比例
+  const heightScale = 1440 / scaleHeight; // 高度缩放比例
   return {
     scaleWidth,
     scaleHeight,
-    scale
+    widthScale,
+    heightScale
   };
 };
 

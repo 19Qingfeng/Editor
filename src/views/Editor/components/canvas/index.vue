@@ -28,6 +28,7 @@
           "
           class="single-source"
         >
+          {{ source.type === "text" ? source.name : "" }}
           <template v-if="curId === source.id">
             <div class="scale add" @click.stop="onScale(source, 'add')">+</div>
             <div class="scale sub" @click.stop="onScale(source, 'sub')">-</div>
@@ -41,6 +42,7 @@
 <script>
 import { mapGetters, mapActions, mapState } from "vuex";
 import { basename, extname } from "path";
+import { TextModel } from "../../../../utils/model";
 import debounce from "lodash/debounce";
 import {
   getActualDisplaySize,
@@ -61,7 +63,9 @@ export default {
     ...mapGetters("picture", [
       "animationBookList",
       "curAnimationBook",
-      "canvasScale",
+      // "canvasScale",
+      "canvasWidthScale",
+      "canvasHeightScale",
       "curAnimationBookBg",
       "curAnimationBookSource",
       "curAnimationEleEventList"
@@ -87,6 +91,7 @@ export default {
   methods: {
     ...mapActions("picture", [
       "changeScale",
+      "updateAnimationSize",
       "addSourceToCurrentBook",
       "changeAnimationBookBg",
       "changeAnimationStyle",
@@ -147,20 +152,24 @@ export default {
       const source = parseStringify(e.dataTransfer.getData("source"));
       const isFirst = parseStringify(e.dataTransfer.getData("isFirst"));
       const { x, y } = parseStringify(e.dataTransfer.getData("offset"));
-      const { name } = source;
+      const { name, type } = source;
       const sourceName = basename(name);
       const extName = extname(name);
+      const isText = type === "text";
       const isPng = extName.indexOf("webp") !== -1;
       const isBg = sourceName.indexOf("_bg") !== -1;
       if (isBg) {
         this.hanldeBgPng(source);
+      } else if (isText) {
+        // 文本
+        this.hanldeDropText(e, source, isFirst, x, y);
       } else if (!isBg && isPng) {
+        // 动画元素
         this.hanldeNotBgPng(e, source, isFirst, x, y);
       }
     },
     // 处理非背景图
     hanldeNotBgPng(e, source, isFirst, ...offset) {
-      console.log(offset, "offset");
       if (isFirst) {
         this._handleFirstAnimation(e, source, offset);
       } else {
@@ -180,8 +189,8 @@ export default {
       const displayLeft = e.clientX - this.canvasLeft - offsetX; //  - displayWidth / 2;
       const displayTop = e.clientY - this.canvasTop - offsetY; // - displayHeight / 2;
       // 映射在2340和1440的偏移量
-      const top = getFormatJsonSize(displayTop, this.canvasScale);
-      const left = getFormatJsonSize(displayLeft, this.canvasScale);
+      const top = getFormatJsonSize(displayTop, this.canvasHeightScale);
+      const left = getFormatJsonSize(displayLeft, this.canvasWidthScale);
       return {
         displayLeft,
         displayTop,
@@ -212,8 +221,11 @@ export default {
       getPictureSize(normalizationPath(path)).then(({ height, width }) => {
         console.log(height, "height");
         console.log(width, "width");
-        const displayHeight = getActualDisplaySize(height, this.canvasScale);
-        const displayWidth = getActualDisplaySize(width, this.canvasScale);
+        const displayHeight = getActualDisplaySize(
+          height,
+          this.canvasHeightScale
+        );
+        const displayWidth = getActualDisplaySize(width, this.canvasWidthScale);
         // 计算相对于canvas画布的实际显示偏移位置 左上角
         const { displayLeft, displayTop, top, left } = this.getOffset(e, {
           offsetX,
@@ -261,6 +273,46 @@ export default {
       });
     },
 
+    // 处理文本
+    hanldeDropText(e, source, isFirst, ...offset) {
+      if (isFirst) {
+        this._handleFirstTextEl(e, source, offset);
+      } else {
+        this._handleNotFirstTextEl(e, source, offset);
+      }
+    },
+
+    // 新增
+    _handleFirstTextEl(e, { id, name }, offset) {
+      console.log("新增");
+      // 万年不变: 获得left width
+      // 只是 固定给 200 200 fontsize 给定 16px字体大小
+      const [offsetX, offsetY] = offset;
+      // 计算相对于canvas画布的实际显示偏移位置 左上角
+      const { displayLeft, displayTop, top, left } = this.getOffset(e, {
+        offsetX,
+        offsetY
+      });
+      const source = new TextModel({
+        id,
+        name,
+        displayLeft,
+        displayTop,
+        top,
+        left,
+        widthScale: this.canvasWidthScale,
+        heightScale: this.canvasHeightScale
+      });
+      this.addSourceToCurrentBook(source);
+    },
+
+    // 更新
+    _handleNotFirstTextEl() {
+      // nothing
+      console.log("更新");
+      alert("文本更新还没有写");
+    },
+
     // 初始化画布大小
     initCanvasSize() {
       const el = this.$refs["canvasWrapper"];
@@ -268,13 +320,17 @@ export default {
       // 当前元素尺寸
       const { offsetWidth, offsetHeight } = el;
       // 按照比例缩放
-      const { scaleWidth, scaleHeight, scale } = getCanvasSize(
-        offsetWidth,
-        offsetHeight
-      );
-      this.changeScale(scale);
-      console.log(scale, "scale");
-      console.log("针对2340*1440尺寸下的最终映射比例", scale);
+      const {
+        scaleWidth,
+        scaleHeight,
+        widthScale,
+        heightScale
+      } = getCanvasSize(offsetWidth, offsetHeight);
+      this.changeScale({ widthScale, heightScale });
+      // 其实高度和宽度缩放比例永远是一致的 因为画布一直会维持16:9
+      console.log(widthScale, "宽度缩放比例scale");
+      console.log(heightScale, "高度缩放比例");
+      // console.log("针对2340*1440尺寸下的最终映射比例", scale);
       canvas.style.height = `${scaleHeight}px`;
       canvas.style.width = `${scaleWidth}px`;
       this.$nextTick(() => {
@@ -288,7 +344,9 @@ export default {
     scaleEvent: debounce(function() {
       // 重新初始化画布大小
       this.initCanvasSize();
-      // 缩放比计算有问题
+      // 缩放比计算有问题 已经更新为高度和宽度计算了
+      // 接下来进行元素的根据比例缩放
+      this.updateAnimationSize();
     }, 200),
 
     // 监听大小缩放事件
@@ -300,6 +358,11 @@ export default {
     window.removeEventListener("resize", this.scaleEvent);
   },
   created() {
+    // 这里会报错 如果不存在bg
+    if (!this.curAnimationBookBg) {
+      this.bgImage = "";
+      return;
+    }
     const { path } = this.curAnimationBookBg;
     this.bgImage = this.getBackgroundImage(path);
   },
@@ -330,6 +393,9 @@ export default {
       outline: 1px solid red;
     }
     .single-source {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       position: absolute;
       .scale {
         width: 25px;

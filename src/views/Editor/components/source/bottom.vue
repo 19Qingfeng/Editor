@@ -30,7 +30,7 @@
             </div>
           </el-popover>
 
-          <!-- 没有弹出框 -->
+          <!-- 一般场景 -->
           <div
             v-else
             class="source"
@@ -60,7 +60,7 @@ export default {
   components: {
     TitleCmp
   },
-  inject: ["getSourceList"],
+  inject: ["getSourceList", "getWordList"],
   data() {
     return {
       title: "资源库",
@@ -83,12 +83,16 @@ export default {
     ...mapState("music", ["video"]),
     sourceList() {
       return this.getSourceList();
+    },
+    wordList() {
+      return this.getWordList();
     }
   },
   methods: {
     ...mapActions("music", ["handleChangeVideo"]),
     initSourceList() {
-      this.formatSourceList = parseSourceList(this.sourceList);
+      // 同时应该增加文字的source 文字的source没有path
+      this.formatSourceList = parseSourceList(this.sourceList, this.wordList);
     },
     saveDataset(value) {
       return getStringify(value);
@@ -101,6 +105,7 @@ export default {
     },
     // 判断是否是音乐 是否可以播放
     isMusic(item) {
+      if (item.text) return false;
       const { name } = item;
       const extName = path.extname(name);
       const musicList = [".mp3", ".wav"];
