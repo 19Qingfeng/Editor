@@ -6,6 +6,7 @@ export interface BaseInfo {
   category: number;
   preview: string;
   guidance: string;
+  [props: string]: any;
 }
 
 // 绘本存在资源
@@ -102,6 +103,7 @@ export interface Event {
     | "bgSound" // 背景音乐
     | "effectSound"; // 播放音效
   target?: string; // 目标动画ID
+  animationName?: string; // 播放动画名城 暂时放成输入框
   playSound?: string; // 音频/音乐/背景的key
   delay?: number;
   position?: {

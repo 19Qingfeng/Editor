@@ -213,6 +213,9 @@ const mutations = {
     });
     Vue.set(state.animationBook, "animationList", updateAnimationBook);
   },
+  CLEAR_ANIMATION_STYLE() {
+    state.animationElement = {};
+  },
   CHANGE_ANIMATION_STYLE(state: any, animationId: any) {
     const { animationList = [] } = state.animationBook;
     const curAnimation = animationList.find((i: any) => i.id === animationId);
@@ -221,7 +224,7 @@ const mutations = {
   UPDATE_ANIMATION_EVENT(state: any, payload: Event) {
     const { eventList = {} } = state.animationElement;
     const copyEventList = cloneDeep(eventList);
-    const { id, eventType, ...updateInfo } = payload;
+    const { id, eventType, ...updateInfo } = payload; // evnetType表示当前事件类型
     // 当前eventType下的字段
     const currentEventTypeList = copyEventList[eventType];
     const index = currentEventTypeList.findIndex((i: Event) => i.id === id);
@@ -295,6 +298,10 @@ const actions = {
   // 删除绘本当前页的资源
   deleteSourceToCurrentBook({ commit }: any, payload: any) {
     commit("DELETE_SOURCE_TO_CURRENT_BOOK", payload);
+  },
+  // 清空当前选择的动画
+  clearAnimationStyle({commit}:any) {
+    commit("CLEAR_ANIMATION_STYLE")
   },
   // 点击切换当前插画页的动画(事件，音乐xxx之类)
   changeAnimationStyle({ commit }: any, animationId: number) {

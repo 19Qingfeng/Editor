@@ -60,6 +60,7 @@ class AnimationEvent implements Event {
 // 文字构造函数
 class TextModel {
   id: string;
+  sourceId: string; // 对应生成JSON的ID
   height: number; // 1440下的高度
   width: number; // 2340下的高度
   left: number;
@@ -95,6 +96,7 @@ class TextModel {
     left
   }: any) {
     this.id = id;
+    this.sourceId = id;
     this.height = 200; // 默认200
     this.width = 600; // 默认 600
     this.displayHeight = getActualDisplaySize(this.height, heightScale);

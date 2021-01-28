@@ -17,10 +17,21 @@
       ></el-input>
     </div>
     <div class="event-wrapper">
-      <div class="title">更新文本:</div>
-      <el-select size="mini" v-model="curTarget">
+      <div class="title">当前:</div>
+      <el-select size="mini" v-model="curTextBefore">
         <el-option
-          v-for="source in curAnimationBookSource"
+          v-for="source in wordSourceList"
+          :key="source.id"
+          :value="source.id"
+          :label="source.name"
+        />
+      </el-select>
+    </div>
+    <div class="event-wrapper">
+      <div class="title">更新:</div>
+      <el-select size="mini" v-model="curTextAfter">
+        <el-option
+          v-for="source in wordSourceList"
           :key="source.id"
           :value="source.id"
           :label="source.name"

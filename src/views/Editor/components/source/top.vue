@@ -51,7 +51,11 @@ export default {
     TitleCmp
   },
   computed: {
-    ...mapGetters("picture", ["curAnimationBookSource", "curAnimationBookBg"]),
+    ...mapGetters("picture", [
+      "curAnimationBookSource",
+      "curAnimationBookBg",
+      "curAnimationElement"
+    ]),
     hasAnimation() {
       if (
         this.curAnimationBookSource?.length !== 0 &&
@@ -81,15 +85,21 @@ export default {
   methods: {
     ...mapActions("picture", [
       "changeAnimationBookBg",
-      "deleteSourceToCurrentBook"
+      "deleteSourceToCurrentBook",
+      "clearAnimationStyle"
     ]),
     handleRemoveBg() {
       this.changeAnimationBookBg();
     },
     handleRemoveAnimation(animation) {
+      const { id } = animation;
+      if (id === this.curAnimationElement?.id) {
+        console.log("一个动画吗");
+        // 如果是当前选中的动画被删除 那么就要清除当前选中的
+        this.clearAnimationStyle();
+      }
+      // 在进行对比
       this.deleteSourceToCurrentBook(animation);
-      console.log(animation, "animation");
-      // 删除动画元素 同理 删除vuex中的动画元素就好了
     }
   }
 };

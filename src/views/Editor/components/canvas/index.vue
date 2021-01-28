@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-wrapper" ref="canvasWrapper">
+  <div class="canvas-wrapper" ref="canvasWrapper" @click="hanldeClickContent">
     <div
       ref="canvas"
       class="canvas"
@@ -44,6 +44,7 @@ import { mapGetters, mapActions, mapState } from "vuex";
 import { basename, extname } from "path";
 import { TextModel } from "../../../../utils/model";
 import debounce from "lodash/debounce";
+import { v4 } from "uuid";
 import {
   getActualDisplaySize,
   getOffsetSize,
@@ -64,14 +65,27 @@ export default {
       "animationBookList",
       "curAnimationBook",
       // "canvasScale",
+      "curAnimationElement", // 当前canvas正在编辑的元素动画
       "canvasWidthScale",
       "canvasHeightScale",
       "curAnimationBookBg",
       "curAnimationBookSource",
       "curAnimationEleEventList"
-    ])
+    ]),
+    // 当前正在编辑的动画ID
+    curId() {
+      return this.curAnimationElement?.id;
+    }
   },
   watch: {
+    // 防止页数切换时候 复用页面并不更新
+    "curAnimationBook.id": {
+      handler() {
+        const { path = "" } = this.curAnimationBookBg;
+        if (!path) return;
+        this.bgImage = this.getBackgroundImage(path);
+      }
+    },
     "curAnimationBook.bg": {
       handler(bg) {
         if (!bg) this.bgImage = "";
@@ -80,7 +94,6 @@ export default {
   },
   data() {
     return {
-      curId: "", // 当前Id
       canvas: null,
       canvasLeft: 0,
       canvasTop: 0,
@@ -94,14 +107,25 @@ export default {
       "updateAnimationSize",
       "addSourceToCurrentBook",
       "changeAnimationBookBg",
+      "clearAnimationStyle",
       "changeAnimationStyle",
       "updateAnimationStyle"
     ]),
+    // 清空当前选择的动画
+    hanldeClickContent(event) {
+      const classList = Array.from(event.target.classList);
+      const isAnimation = classList.includes("single-source");
+      // 点击不是动画 就直接清空当前动画吗 清空选中
+      if (!isAnimation) {
+        this.clearAnimationStyle();
+      }
+    },
     getBackgroundImage(path) {
       if (!path) return "";
       return `url(${normalizationPath(path)}) center / 100% 100%`;
     },
     onDragStart(e, source) {
+      this.clearAnimationStyle();
       const { offsetX, offsetY } = e;
       // 缩放开始
       e.dataTransfer.setData("isFirst", getStringify(false));
@@ -173,15 +197,14 @@ export default {
       if (isFirst) {
         this._handleFirstAnimation(e, source, offset);
       } else {
-        this._handleNotFirstAnimation(e, source, offset);
+        // this._handleNotFirstAnimation(e, source, offset);
+        this._handleNotFirstElement(e, source, offset);
       }
     },
 
     handleClick(source) {
       const { id } = source;
       this.changeAnimationStyle(id);
-      // 高亮当前动画
-      this.curId = id;
     },
     // 计算画布中实际的偏移量和在2340和1440映射偏移量
     getOffset(e, { offsetX, offsetY }) {
@@ -215,8 +238,9 @@ export default {
         left
       });
     },
+    // id重新生成
     // 处理第一次元素拖放 需要额外格式化尺寸(画布元素外拖拽进来)
-    _handleFirstAnimation(e, { id, name, path }, offset) {
+    _handleFirstAnimation(e, { name, path }, offset) {
       const [offsetX, offsetY] = offset;
       getPictureSize(normalizationPath(path)).then(({ height, width }) => {
         console.log(height, "height");
@@ -232,7 +256,7 @@ export default {
           offsetY
         });
         const source = {
-          id,
+          id: v4(),
           height,
           name,
           width,
@@ -262,12 +286,12 @@ export default {
         this.addSourceToCurrentBook(source);
       });
     },
-    // 处理背景图
-    hanldeBgPng({ id, name, path }) {
+    // 处理背景图 id重新生成
+    hanldeBgPng({ name, path }) {
       this.bgImage = this.getBackgroundImage(path);
       // 绘本当前页添加资源
       this.changeAnimationBookBg({
-        id,
+        id: v4(),
         name,
         path
       });
@@ -278,7 +302,7 @@ export default {
       if (isFirst) {
         this._handleFirstTextEl(e, source, offset);
       } else {
-        this._handleNotFirstTextEl(e, source, offset);
+        this._handleNotFirstElement(e, source, offset);
       }
     },
 
@@ -294,7 +318,8 @@ export default {
         offsetY
       });
       const source = new TextModel({
-        id,
+        id: v4(),
+        sourceId: id,
         name,
         displayLeft,
         displayTop,
@@ -307,10 +332,20 @@ export default {
     },
 
     // 更新
-    _handleNotFirstTextEl() {
-      // nothing
-      console.log("更新");
-      alert("文本更新还没有写");
+    _handleNotFirstElement(e, source, offset) {
+      const { id } = source;
+      const [offsetX, offsetY] = offset;
+      const { displayLeft, displayTop, top, left } = this.getOffset(e, {
+        offsetX,
+        offsetY
+      });
+      this.updateAnimationStyle({
+        id,
+        displayLeft,
+        displayTop,
+        top,
+        left
+      });
     },
 
     // 初始化画布大小
@@ -370,7 +405,6 @@ export default {
     this.canvas = this.$refs["canvas"];
     this.initCanvasSize();
     this.initScaleEvent();
-    // initCanvasSize
   }
 };
 </script>
@@ -390,7 +424,7 @@ export default {
     height: 100%;
     width: 100%;
     .hover-animation {
-      outline: 1px solid red;
+      outline: 1px solid rgba(0, 0, 0, 0.2);
     }
     .single-source {
       display: flex;
@@ -402,7 +436,6 @@ export default {
         height: 25px;
         display: flex;
         justify-content: center;
-        // align-items: center;
         line-height: 24px;
         font-size: 20px;
         position: absolute;

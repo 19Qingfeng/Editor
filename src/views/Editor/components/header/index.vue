@@ -62,6 +62,7 @@ export default {
   computed: {
     ...mapGetters("picture", ["curAnimationBookIndex"]),
     ...mapGetters("music", ["speedProcess"]),
+    ...mapState("picture", ["currentPicture"]),
     ...mapState("music", [
       "video",
       "videoDuration",
@@ -100,7 +101,10 @@ export default {
           text: "底层"
         },
         {
-          text: "添加文本"
+          text: "导出",
+          on: () => {
+            this.exportPicture();
+          }
         },
         {
           text: "返回",
@@ -123,6 +127,10 @@ export default {
     // 停止音乐
     handleStopMusic() {
       this.hanldeStopMusic();
+    },
+    // 导出绘本
+    exportPicture() {
+      console.log(this.currentPicture, "currentPicture");
     }
   }
 };

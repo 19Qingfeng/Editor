@@ -28,6 +28,18 @@
       </el-select>
     </div>
     <div class="event-wrapper">
+      <div class="title">动画:</div>
+      <!-- <el-select size="mini" v-model="curTarget"> -->
+      <!-- <el-option
+          v-for="source in curAnimationBookSource"
+          :key="source.id"
+          :value="source.id"
+          :label="source.name"
+        /> -->
+      <el-input v-model="animationName" />
+      <!-- </el-select> -->
+    </div>
+    <div class="event-wrapper">
       <div class="title">延迟:</div>
       <el-input size="mini" v-model="curDelay">
         <template>

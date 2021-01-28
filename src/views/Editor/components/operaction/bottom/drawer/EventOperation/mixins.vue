@@ -21,9 +21,18 @@ export default {
     // 获取当前所有的动画元素 自己选吧
     ...mapGetters("picture", [
       "curAnimationBookSource",
+      "curAnimationElement", // 当前正在编辑的动画元素
+      "wordSourceList", // 所有文本资源
       "sourceList", // 所有资源
       "curAnimationEleEventList"
     ]),
+    // 当前正在操作的动画的元素
+    curSelectAnimationEle() {
+      return {
+        name: this.curAnimationElement.name,
+        id: this.curAnimationElement.id
+      };
+    },
     // 当前操作的事件对象
     curEvent() {
       return this.curAnimationEleEventList.find(i => i.id === this.id);
@@ -33,6 +42,20 @@ export default {
       return this.sourceList.filter(i => {
         return [".mp3", ".wav"].includes(path.extname(i.name));
       });
+    },
+
+    // 播放动画名
+    animationName: {
+      get() {
+        return this.curEvent.target;
+      },
+      set(val) {
+        this.updateAnimationEvent({
+          id: this.id,
+          eventType: this.eventType,
+          animationName: val
+        });
+      }
     },
     // 目标元素
     curTarget: {
@@ -139,16 +162,24 @@ export default {
         return this.curEvent.textBefore;
       },
       set(val) {
-        // nothing
+        this.updateAnimationEvent({
+          id: this.id,
+          eventType: this.eventType,
+          textBefore: val
+        });
       }
     },
     // 文字之后
     curTextAfter: {
       get() {
-        return this.curEvent.curTextAfter;
+        return this.curEvent.textAfter;
       },
       set(val) {
-        // nothing
+        this.updateAnimationEvent({
+          id: this.id,
+          eventType: this.eventType,
+          textAfter: val
+        });
       }
     }
   },

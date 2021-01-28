@@ -39,13 +39,15 @@ import { mapActions, mapGetters } from "vuex";
 import BaseOpertion from "./EventOperation/base";
 import MusicOperation from "./EventOperation/music";
 import PositionOperation from "./EventOperation/position";
+import TextOpeartion from "./EventOperation/text";
 import { AnimationEvent } from "@/utils/model";
 export default {
   name: "Drawer",
   components: {
     BaseOpertion,
     MusicOperation,
-    PositionOperation
+    PositionOperation,
+    TextOpeartion
   },
   data() {
     return {
@@ -116,7 +118,8 @@ export default {
         sound: "MusicOperation", // 配音
         effectSound: "MusicOperation", // 音效
         bgSound: "MusicOperation", // 背景音乐
-        transform: "PositionOperation" //位置
+        transform: "PositionOperation", //位置
+        text: "TextOpeartion" // 文本
       };
       return moduleNameList[type];
     },
