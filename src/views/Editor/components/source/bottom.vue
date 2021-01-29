@@ -30,7 +30,7 @@
             </div>
           </el-popover>
 
-          <!-- 一般场景 -->
+          <!-- 一般图片 -->
           <div
             v-else
             class="source"

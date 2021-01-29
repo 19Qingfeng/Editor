@@ -2,7 +2,7 @@
   <div class="title-header">
     <div class="title">{{ title }}</div>
     <div class="btn-wrapper">
-      <el-button
+      <!-- <el-button
         class="btn"
         v-for="(btn, index) in btnList"
         type="text"
@@ -11,7 +11,7 @@
         @click="btn.on"
       >
         {{ btn.text }}
-      </el-button>
+      </el-button> -->
     </div>
   </div>
 </template>

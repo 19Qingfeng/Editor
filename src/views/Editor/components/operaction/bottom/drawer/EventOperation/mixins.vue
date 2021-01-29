@@ -33,6 +33,10 @@ export default {
         id: this.curAnimationElement.id
       };
     },
+    // 当前页面出现的所有ID元素
+    curWordSourceList() {
+      return this.curAnimationBookSource.filter(i => i.type === "text");
+    },
     // 当前操作的事件对象
     curEvent() {
       return this.curAnimationEleEventList.find(i => i.id === this.id);
@@ -47,7 +51,7 @@ export default {
     // 播放动画名
     animationName: {
       get() {
-        return this.curEvent.target;
+        return this.curEvent.animationName;
       },
       set(val) {
         this.updateAnimationEvent({
@@ -184,7 +188,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions("picture", ["updateAnimationEvent"]),
+    ...mapActions("picture", ["updateAnimationEvent", "delAnimationEvent"]),
     parseEventType(type) {
       const typeList = {
         auto: "自动",
@@ -215,8 +219,12 @@ export default {
       return typeList[type];
     },
     hanldeDelete() {
-      const id = this.id;
-      console.log(`从vuex中删除对应${id}就可以了`);
+      const payload = {
+        type: this.eventType,
+        id: this.id
+      };
+      this.delAnimationEvent(payload);
+      this.$message("删除成功");
     }
   }
 };

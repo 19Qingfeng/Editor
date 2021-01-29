@@ -23,7 +23,7 @@
         <el-option
           v-for="source in musicSourceList"
           :key="source.id"
-          :value="source.id"
+          :value="source.name"
           :label="source.name"
         />
       </el-select>

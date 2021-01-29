@@ -20,7 +20,7 @@
       <div class="title">当前:</div>
       <el-select size="mini" v-model="curTextBefore">
         <el-option
-          v-for="source in wordSourceList"
+          v-for="source in curWordSourceList"
           :key="source.id"
           :value="source.id"
           :label="source.name"
@@ -29,7 +29,11 @@
     </div>
     <div class="event-wrapper">
       <div class="title">更新:</div>
-      <el-select size="mini" v-model="curTextAfter">
+      <el-select
+        size="mini"
+        v-model="curTextAfter"
+        :disabled="curTextBefore === ''"
+      >
         <el-option
           v-for="source in wordSourceList"
           :key="source.id"

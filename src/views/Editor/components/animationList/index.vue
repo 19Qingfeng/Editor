@@ -8,10 +8,11 @@
     <div
       v-for="book in animationBookList"
       class="book"
+      :style="{ background: getBackgroundImage(book.bg.path) }"
       :key="book.id"
       @click="changeBook(book.id)"
     >
-      {{ book }}
+      <!-- {{ book }} -->
     </div>
     <div class="book new" @click="addBook">+新建页面</div>
     <span slot="footer" class="dialog-footer">
@@ -22,7 +23,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { v4 } from "uuid";
-
+import { normalizationPath } from "../../../../utils/index";
 export default {
   name: "CtxDialog",
   props: {
@@ -55,14 +56,13 @@ export default {
   },
   methods: {
     ...mapActions("picture", ["addAnimationBook", "changeAnimationBook"]),
+    getBackgroundImage(path) {
+      if (!path) return "";
+      return `url(${normalizationPath(path)}) center / 100% 100%`;
+    },
     // 切换插画中的绘本
-    async changeBook(id) {
+    changeBook(id) {
       //  判断是否修改了
-      await this.$confirm("此操作将丢失未保存信息, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      });
       this.changeAnimationBook(id);
       this.dialogVisible = false;
     },

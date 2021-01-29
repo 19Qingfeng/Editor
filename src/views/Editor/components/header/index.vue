@@ -48,7 +48,9 @@
 </template>
 
 <script>
+import { saveJsonToFile } from "@/utils/excel";
 import { mapActions, mapGetters, mapState } from "vuex";
+import { formatOuterObj } from "../../../../utils/export";
 import AnimationList from "../animationList";
 export default {
   data() {
@@ -60,7 +62,7 @@ export default {
     AnimationList
   },
   computed: {
-    ...mapGetters("picture", ["curAnimationBookIndex"]),
+    ...mapGetters("picture", ["curAnimationBookIndex", "animationBookList"]),
     ...mapGetters("music", ["speedProcess"]),
     ...mapState("picture", ["currentPicture"]),
     ...mapState("music", [
@@ -83,54 +85,124 @@ export default {
         {
           text: "保存",
           on: () => {
-            console.log("点击保存");
-            // 将vuex中的当前绘本信息 组合 然后推入electron-stroe
             this.saveAnimationBook();
+            this.$message.success({
+              showClose: true,
+              message: "保存成功"
+            });
           }
         },
         {
-          text: "复制"
+          text: "复制",
+          on: () => {
+            // 复制的话 直接将这一张的内容复制一下 id要不要重复
+            this.copyCurAnimationBook();
+            this.$message.success({
+              showClose: true,
+              message: "复制成功"
+            });
+          }
         },
         {
-          text: "粘贴"
+          text: "粘贴",
+          on: () => {
+            // 粘贴当前页数
+            this.$confirm("此操作会丢失当前页信息，确定继续吗?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning"
+            }).then(() => {
+              if (!this.animationBookList.length) return;
+              this.pasteCurAnimationBook(this.curAnimationBookIndex);
+              this.$message.success({
+                showClose: true,
+                message: "粘贴成功"
+              });
+            });
+          }
         },
         {
-          text: "顶层"
+          text: "顶层",
+          on: () => {
+            this.handleChangePage(0);
+          }
         },
         {
-          text: "底层"
+          text: "底层",
+          on: () => {
+            this.handleChangePage(this.animationBookList.length - 1);
+          }
         },
         {
           text: "导出",
           on: () => {
+            this.saveAnimationBook();
             this.exportPicture();
+            this.$message.success("导出成功");
           }
         },
         {
           text: "返回",
           on: () => {
-            this.$router.push({
-              name: "Home"
-            });
+            this.handleOnBace();
           }
         }
       ];
     }
   },
   methods: {
-    ...mapActions("picture", ["saveAnimationBook"]),
+    ...mapActions("picture", [
+      "saveAnimationBook",
+      "changeAnimationBook",
+      "copyCurAnimationBook",
+      "pasteCurAnimationBook"
+    ]),
     ...mapActions("music", ["hanldeStopMusic"]),
     // 打开绘本中的插画弹窗
     openPictureList() {
       this.isShow = true;
     },
+    handleOnBace() {
+      // 先进行处理返回
+      this.$confirm("此操作会丢失未保存信息，确定继续吗?", "提示", {
+        confirmButtonText: "强行退出",
+        cancelButtonText: "保存后退出",
+        type: "warning"
+      })
+        .catch(() => {
+          this.saveAnimationBook();
+        })
+        .finally(() => {
+          this.$router.push({
+            name: "Home"
+          });
+        });
+    },
     // 停止音乐
     handleStopMusic() {
       this.hanldeStopMusic();
     },
+    // 切换页数
+    handleChangePage(index) {
+      const page = this.animationBookList[index];
+      const pageId = page.id;
+      if (!pageId) {
+        return;
+      }
+      this.changeAnimationBook(pageId);
+      this.$message.success({
+        message: "切换成功",
+        showClose: true
+      });
+    },
     // 导出绘本
     exportPicture() {
-      console.log(this.currentPicture, "currentPicture");
+      const result = formatOuterObj(this.currentPicture);
+      // 获得资源存放路径 然后根据路径打包
+      const saveDirPath = this.currentPicture.sourceList.find(i => {
+        return i.path;
+      }).path;
+      saveJsonToFile(saveDirPath, result, "result.json");
     }
   }
 };

@@ -29,7 +29,7 @@ class AnimationEvent implements Event {
   constructor(params: Event) {
     this.id = v4();
     this.target = params.target;
-    this.playSound = params.playSound;
+    this.playSound = params.playSound; // 音乐name
     this.type = params.type;
     this.eventType = params.eventType;
     // if (params.delay) {

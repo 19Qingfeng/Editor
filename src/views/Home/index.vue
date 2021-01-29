@@ -44,6 +44,7 @@ export default Vue.extend({
   methods: {
     ...mapActions("picture", ["setCurrentEditPictureBook"]),
     addPictureBook() {
+      this.id = "";
       this.isShow = true;
     },
     editPictureBook(id: string) {

@@ -6,12 +6,13 @@ import fs from "fs";
 
 const saveJsonToFile = (
   path: string,
-  result: any
+  result: any,
+  name = `string.json`
 ): { output: string; data: any } => {
   // 保存文件
   const dir = dirname(path);
   // const baseName = basename(path,'.xlsx');
-  const output = join(dir, `string.json`);
+  const output = join(dir, name);
   const resultString = JSON.stringify(result);
   fs.writeFileSync(output, resultString, "utf-8");
   return { output, data: result };
@@ -44,4 +45,4 @@ const parseExceltoJson = (
   return formatJson(path, list);
 };
 
-export { parseExceltoJson };
+export { parseExceltoJson, saveJsonToFile };

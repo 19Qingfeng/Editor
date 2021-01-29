@@ -1,0 +1,692 @@
+{
+  "title": "猜猜里面有什么",
+  "author": "谷子",
+  "version": null,
+  "creat_date": "2021-01-04 16:25:30",
+  "page_list": [{
+    "interrupt": "true", // 暂时无用
+    "page_index": 0, // 当前页索引
+    "color": "#ffffff", // 背景色 #fff
+    "sprite_list": [{ // 每一页的动画元素 对应animationList
+        "widget_id": "sp02/tu1.webp", // 目标ID 场景上的ID
+        "type": "image", // 文件类型
+        "tip": "倒立萝卜", // 没有用
+        "file_name": "sp02/tu1.webp", // 相对路径 
+        "position": {
+          "x": 479,
+          "y": 727,
+          "w": 991,
+          "h": 192,
+        },
+        "animations": null, // 字段需要 不理会值
+        "first_animation": "idle", // 首次播放动画 输入框 每个动画资源独有 只有动画有flr 音频 png 文本都没有
+        "text": null, // 开始文本内容
+        // Excel中的资源ID
+        "attributes": null, // 富文本暂留 先不理会value
+        // EventList 事件动作
+        "actions": {
+          // 增加自动事件
+          "auto": [{
+            // type 动画和突图片 type根据name区分 
+            "type": "bgSound",
+            "widget_id": null, // 目标ID
+            "action_id": "112312312312312313", // 当前操作ID
+            "delay": 500,
+            "position": null, // { x,y,w,h }
+            "animations": null, // 动画操作栏 增加input输入框string
+            "playSound": "bg_sound.mp3", // 文件名
+            "text": null, // text内容 
+            "attributes": null, // 更新后的富文本 放着
+            // "event_name":null,
+            // "is_show":null
+          }],
+          "click": [{
+              // 和auto一样
+            },
+            {}
+          ],
+          "animaction_complete": [
+            // 动画完成事件
+          ]
+        }
+      },
+      {
+        "widget_id": "sp02/tu2.webp",
+        "type": "image",
+        "tip": "倒立萝卜",
+        "file_name": "sp02/tu2.webp",
+        "position": {
+          "x": 1238,
+          "y": 416,
+          "w": 916,
+          "h": 248,
+          "z": 0
+        },
+        "actions": null,
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle",
+        "text": null,
+        "attributes": null
+      },
+      {
+        "widget_id": "sp02/sp2_huluobo2.flr",
+        "type": "animation",
+        "tip": "倒立萝卜",
+        "file_name": "sp02/sp2_huluobo2.flr",
+        "position": {
+          "x": 9,
+          "y": 274,
+          "w": 632,
+          "h": 609,
+          "z": 0
+        },
+        "actions": null,
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle",
+        "text": null,
+        "attributes": null
+      },
+      {
+        "widget_id": "sp02/sp2_huluobo3.flr",
+        "type": "animation",
+        "tip": "胡萝卜3",
+        "file_name": "sp02/sp2_huluobo3.flr",
+        "position": {
+          "x": 1243,
+          "y": 187,
+          "w": 453,
+          "h": 325,
+          "z": 0
+        },
+        "actions": null,
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle",
+        "text": null,
+        "attributes": null
+      },
+      {
+        "widget_id": "sp02/sp2_huluobo1.flr",
+        "type": "animation",
+        "tip": "胡萝卜3",
+        "file_name": "sp02/sp2_huluobo1.flr",
+        "first_animation": "idle",
+        "position": {
+          "x": 453,
+          "y": 12,
+          "w": 731,
+          "h": 944,
+          "z": 0
+        },
+        "actions": {
+          "onTap": [{
+              "type": "playAnimation",
+              "widget_id": "sp02/sp2_huluobo1.flr",
+              "action_id": "xxxxxxxxxx-xxxxx-01",
+              "delay": 300,
+              "position": null,
+              "animations": [
+                "click"
+              ],
+              "playSound": null,
+              "text": null,
+              "attributes": null,
+              "touchenable": null,
+              "event_name": null,
+              "is_show": null
+            },
+            {
+              "type": "playAnimation",
+              "widget_id": "sp02/sp2_huluobo1.flr",
+              "action_id": "xxxxxxxxxx-xxxxx-03",
+              "delay": 750,
+              "position": null,
+              "animations": [
+                "click_loop"
+              ],
+              "playSound": null,
+              "text": null,
+              "attributes": null,
+              "touchenable": null,
+              "event_name": null,
+              "is_show": null
+            }
+          ]
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "text": null,
+        "attributes": null
+      },
+      {
+        "widget_id": "page1_text_01",
+        "type": "text",
+        "tip": "文字",
+        "position": {
+          "x": 1285,
+          "y": 727,
+          "w": 540,
+          "h": 186,
+          "z": 0
+        },
+        "actions": {
+          "auto": [{
+            "type": "sound",
+            "widget_id": null,
+            "action_id": "1929292929292111111",
+            "delay": 0,
+            "playSound": "sp2_sound_1.mp3"
+          }]
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": null,
+        "text": "胡萝卜脚尖尖\n踢踏、踢踏、跳着舞",
+        "attributes": null
+      }
+    ]
+  }, {
+    "interrupt": "true",
+    "page_index": 1,
+    "color": "#ffffff",
+    "sprite_list": [{
+        "widget_id": "sp04/sp04shuzhi.webp",
+        "type": "image",
+        "tip": "树枝",
+        "file_name": "sp04/sp04shuzhi.webp",
+        "position": {
+          "x": -57,
+          "y": -186,
+          "w": 996,
+          "h": 540,
+          "z": 0
+        },
+        "actions": null,
+        "touchenable": true,
+        "is_show": true
+      },
+      {
+        "widget_id": "sp04/sp04cao.webp",
+        "type": "image",
+        "tip": "小草",
+        "file_name": "sp04/sp04cao.webp",
+        "position": {
+          "x": 1649,
+          "y": 417,
+          "w": 272,
+          "h": 564,
+          "z": 0
+        },
+        "actions": null,
+        "touchenable": true,
+        "is_show": true
+      },
+      {
+        "widget_id": "sp04/sp04tu.webp",
+        "type": "image",
+        "tip": "泥土",
+        "file_name": "sp04/sp04tu.webp",
+        "position": {
+          "x": 123,
+          "y": 803,
+          "w": 1800,
+          "h": 240,
+          "z": 0
+        },
+        "actions": null,
+        "touchenable": true,
+        "is_show": true
+      },
+      {
+        "widget_id": "sp04/sp4.flr",
+        "type": "animation",
+        "tip": "橙子",
+        "file_name": "sp04/sp4.flr",
+        "position": {
+          "x": 134,
+          "y": 84,
+          "w": 1777,
+          "h": 938,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle",
+        "actions": {
+          "onTap": [{
+            "type": "playAnimation",
+            "widget_id": "sp04/sp4.flr",
+            "action_id": "xxxxxxxxxx-xxxxx-01",
+            "delay": 300,
+            "position": null,
+            "animations": [
+              "click"
+            ],
+            "playSound": null,
+            "text": null,
+            "attributes": null,
+            "touchenable": null,
+            "event_name": null,
+            "is_show": null
+          }, {
+            "type": "playAnimation",
+            "widget_id": "sp04/sp4.flr",
+            "action_id": "xxxxxxxxxx-xxxxx-03",
+            "delay": 2400,
+            "position": null,
+            "animations": [
+              "click_loop"
+            ],
+            "playSound": null,
+            "text": null,
+            "attributes": null,
+            "touchenable": null,
+            "event_name": null,
+            "is_show": null
+          }]
+        }
+      }, {
+        "widget_id": "page1_text_01",
+        "type": "text",
+        "tip": "文字",
+        "file_name": null,
+        "position": {
+          "x": 239,
+          "y": 421,
+          "w": 589,
+          "h": 181,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": null,
+        "text": "橘子头顶扁扁，\n吧哒、吧哒、叠高高",
+        "attributes": null,
+        "actions": {
+          "auto": [{
+            "type": "sound",
+            "widget_id": null,
+            "action_id": null,
+            "delay": 1000,
+            "position": null,
+            "animations": null,
+            "playSound": "sp4_sound_1.mp3",
+            "text": null,
+            "attributes": null,
+            "touchenable": null,
+            "event_name": null,
+            "is_show": null
+          }]
+        }
+      }
+    ]
+  }, {
+    "interrupt": "true",
+    "page_index": 2,
+    "color": "#ffffff",
+    "sprite_list": [{
+        "widget_id": "sp11/sp11_nainai.flr",
+        "type": "animation",
+        "tip": "奶奶",
+        "file_name": "sp11/sp11_nainai.flr",
+        "position": {
+          "x": 24,
+          "y": 132,
+          "w": 358,
+          "h": 468,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11bg.webp",
+        "type": "image",
+        "tip": "树枝",
+        "file_name": "sp11/sp11bg.webp",
+        "position": {
+          "x": -210,
+          "y": -180,
+          "w": 2340,
+          "h": 1440,
+          "z": 0
+        },
+        "actions": null,
+        "touchenable": true,
+        "is_show": true
+      },
+      {
+        "widget_id": "sp11/sp4.flr",
+        "type": "animation",
+        "tip": "橙子",
+        "file_name": "sp11/sp4.flr",
+        "position": {
+          "x": 134,
+          "y": 84,
+          "w": 1777,
+          "h": 938,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle",
+        "actions": {
+          "onTap": [{
+            "type": "playAnimation",
+            "widget_id": "sp04/sp4.flr",
+            "action_id": "xxxxxxxxxx-xxxxx-01",
+            "delay": 300,
+            "position": null,
+            "animations": [
+              "click"
+            ],
+            "playSound": null,
+            "text": null,
+            "attributes": null,
+            "touchenable": null,
+            "event_name": null,
+            "is_show": null
+          }, {
+            "type": "playAnimation",
+            "widget_id": "sp04/sp4.flr",
+            "action_id": "xxxxxxxxxx-xxxxx-03",
+            "delay": 2400,
+            "position": null,
+            "animations": [
+              "click_loop"
+            ],
+            "playSound": null,
+            "text": null,
+            "attributes": null,
+            "touchenable": null,
+            "event_name": null,
+            "is_show": null
+          }]
+        }
+      },
+      {
+        "widget_id": "sp11/sp11_juzi.flr",
+        "type": "animation",
+        "tip": "橘子",
+        "file_name": "sp11/sp11_juzi.flr",
+        "position": {
+          "x": 18,
+          "y": 528,
+          "w": 271,
+          "h": 243,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_xigua.flr",
+        "type": "animation",
+        "tip": "西瓜",
+        "file_name": "sp11/sp11_xigua.flr",
+        "position": {
+          "x": 259,
+          "y": 577,
+          "w": 270,
+          "h": 212,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_tudou.flr",
+        "type": "animation",
+        "tip": "土豆",
+        "file_name": "sp11/sp11_tudou.flr",
+        "position": {
+          "x": 781,
+          "y": 864,
+          "w": 458,
+          "h": 226,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_xiangjiao.flr",
+        "type": "animation",
+        "tip": "香蕉",
+        "file_name": "sp11/sp11_xiangjiao.flr",
+        "position": {
+          "x": 1710,
+          "y": 721,
+          "w": 100,
+          "h": 132,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_huluobo.flr",
+        "type": "animation",
+        "tip": "胡萝卜",
+        "file_name": "sp11/sp11_huluobo.flr",
+        "position": {
+          "x": 38,
+          "y": 682,
+          "w": 522,
+          "h": 388,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_fanqie2.flr",
+        "type": "animation",
+        "tip": "番茄",
+        "file_name": "sp11/sp11_fanqie2.flr",
+        "position": {
+          "x": 1447,
+          "y": 566,
+          "w": 455,
+          "h": 454,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle",
+        "actions": {
+          "onTap": [{
+            "type": "playAnimation",
+            "widget_id": "sp11/sp11_fanqie2.flr",
+            "action_id": "xxxxxxxxxx-xxxxx-06",
+            "delay": 500,
+            "position": null,
+            "animations": [
+              "click"
+            ],
+            "playSound": null,
+            "text": null,
+            "attributes": null,
+            "touchenable": null,
+            "event_name": null,
+            "is_show": null
+          }, {
+            "type": "playAnimation",
+            "widget_id": "sp11/sp11_fanqie2.flr",
+            "action_id": "xxxxxxxxxx-xxxxx-07",
+            "delay": 5500,
+            "position": null,
+            "animations": [
+              "click_loop"
+            ],
+            "playSound": null,
+            "text": null,
+            "attributes": null,
+            "touchenable": null,
+            "event_name": null,
+            "is_show": null
+          }]
+        }
+      },
+      {
+        "widget_id": "sp11/sp11_qiezi.flr",
+        "type": "animation",
+        "tip": "茄子",
+        "file_name": "sp11/sp11_qiezi.flr",
+        "position": {
+          "x": 600,
+          "y": 755,
+          "w": 164,
+          "h": 266,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_fanqie.flr",
+        "type": "animation",
+        "tip": "番茄1",
+        "file_name": "sp11/sp11_fanqie.flr",
+        "position": {
+          "x": 1120,
+          "y": 456,
+          "w": 441,
+          "h": 444,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_niao.flr",
+        "type": "animation",
+        "tip": "鸟",
+        "file_name": "sp11/sp11_niao.flr",
+        "position": {
+          "x": 1283,
+          "y": 90,
+          "w": 154,
+          "h": 122,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_caomei.flr",
+        "type": "animation",
+        "tip": "草莓",
+        "file_name": "sp11/sp11_caomei.flr",
+        "position": {
+          "x": 538,
+          "y": 568,
+          "w": 408,
+          "h": 202,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_juzi2.flr",
+        "type": "animation",
+        "tip": "草莓",
+        "file_name": "sp11/sp11_juzi2.flr",
+        "position": {
+          "x": -225,
+          "y": -35,
+          "w": 319,
+          "h": 398,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      },
+      {
+        "widget_id": "sp11/sp11_xiangjiao2.flr",
+        "type": "animation",
+        "tip": "草莓",
+        "file_name": "sp11/sp11_xiangjiao2.flr",
+        "position": {
+          "x": 853,
+          "y": 86,
+          "w": 107,
+          "h": 151,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": "idle"
+      }, {
+        "widget_id": "page1_text_01",
+        "type": "text",
+        "tip": "文字",
+        "file_name": null,
+        "position": {
+          "x": 1399,
+          "y": 165,
+          "w": 434,
+          "h": 100,
+          "z": 0
+        },
+        "touchenable": true,
+        "is_show": true,
+        "animations": null,
+        "first_animation": null,
+        "text": "奶奶回来啦！",
+        "attributes": null,
+        "actions": {
+          "auto": [{
+            "type": "sound",
+            "widget_id": null,
+            "action_id": null,
+            "delay": 1000,
+            "position": null,
+            "animations": null,
+            "playSound": "sp10_sound_1.mp3",
+            "text": null,
+            "attributes": null,
+            "touchenable": null,
+            "event_name": null,
+            "is_show": null
+          }]
+        }
+      }
+    ]
+  }]
+}

@@ -33,22 +33,42 @@ export interface Sprite {
     w: number;
     h: number;
   };
-  animations: string; // 动画动作 暂时不理会
-  first_animation: string;
-  text: ""; // 文本资源ID 对应生成JSON中的ID
-  attributes: any; // 富文本不理会
+  animations?: string; // 动画动作 暂时不理会
+  first_animation?: string;
+  text?: string; // 文本资源ID 对应生成JSON中的ID
+  attributes?: any; // 富文本不理会
   actions: {
-    auto: Event[];
-    click: Event[];
-    animaction_complete: Event[];
+    auto: SpriteEvent[];
+    click: SpriteEvent[];
+    animaction_complete: SpriteEvent[];
   };
 }
 
 // 今天吧接口写完
 
 // 事件对象
-export interface Event {
-  type: "bgSound" | "";
+export interface SpriteEvent {
+  type:
+    | "playAnimation" // 播放动画
+    | "stopAnimation" // 暂停动画
+    | "sound" // 配音
+    | "transform" // 变换
+    | "text" // 文本
+    | "bgSound" // 背景音乐
+    | "effectSound"; // 播放音效
+  widget_id: string; // 目标元素ID 音乐为空的
+  action_id: string; // 本次操作生成的唯一标示符ID
+  delay?: number;
+  position?: {
+    x?: number;
+    y?: number;
+    w?: number;
+    h?: number;
+  };
+  animations?: string; // 动画输入框输入的string
+  playSound?: string; // 音乐播放的文件名
+  text?: string; // text的内容 ？ 应该是ID 更新后的sourceId
+  attributes: string; // 没用
 }
 
 export interface EditorJson extends PictureBook {

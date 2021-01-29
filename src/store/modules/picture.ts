@@ -7,6 +7,7 @@ import {
   Event
 } from "../../types/index";
 import cloneDeep from "lodash/cloneDeep";
+import { v4 } from "uuid";
 import { store } from "../../electon-store";
 import Vue from "vue";
 const state = {
@@ -15,6 +16,7 @@ const state = {
   wordList: {}, //当前绘本中所有的文字资源
   /* 当前绘本的插画信息 */
   animationBook: {}, // 当前插画页
+  copyAnimationBook: {}, // 复制的信息
   animationBookIndex: 0,
   widthScale: 0, // 画布宽度缩放比例
   heightScale: 0, // 画布高度缩放比例
@@ -107,7 +109,30 @@ const mutations = {
   },
   ADD_PICTURE_BOOK(state: any, payload: PictureBook) {
     state.pictureList = [...state.pictureList, payload];
-    store.addPicture(state.pictureList);
+    store.updatePicture(state.pictureList);
+  },
+  UPDATE_PICTURE_BOOK(
+    state: any,
+    payload: { id: string; picture: PictureBook }
+  ) {
+    const { id, picture } = payload;
+    const index = state.pictureList.findIndex((i: PictureBook) => i.id === id);
+    const updateBook = cloneDeep(picture);
+    if (index !== -1) {
+      // state.pictureList[index] = updateBook;
+      Vue.set(state.pictureList, index, updateBook);
+      store.updatePicture(state.pictureList);
+    }
+  },
+  COPY_CURRENT_ANIMATION_BOOK(state: any) {
+    const cloneBook = cloneDeep(state.animationBook);
+    cloneBook.id = v4();
+    state.copyAnimationBook = cloneBook;
+  },
+  PASTE_CURRENT_ANIMATION_BOOK(state: any, pageIndex: number) {
+    const book = cloneDeep(state.copyAnimationBook);
+    state.animationBook = book; // 改变当前页
+    Vue.set(state.currentPicture.animationBookList, pageIndex, book); // 改变整个绘本
   },
   SET_CURRENT_PICTURE_BOOK(state: any, payload: PictureBook) {
     state.currentPicture = cloneDeep(payload);
@@ -121,10 +146,6 @@ const mutations = {
     store.saveAnimationBookInPicture(state.currentPicture);
     // 并且更新一下所有绘本在vuex中的值
     state.pictureList = store.getPicture();
-    // console.log(state.currentPicture, "state.当前绘本");
-    // 将当前插画页保存到electron-store中
-    // console.log(state.animationBook, "当前插画");
-    // console.log(state.currentPicture, "当前绘本");
   },
   ADD_ANIMATION_BOOK(state: any, book: AnimationBook) {
     state.currentPicture.animationBookList.push(book);
@@ -146,11 +167,6 @@ const mutations = {
   CHANGE_ANIMATION_BOOK_BG(state: any, bg: Bg | undefined) {
     if (!bg?.path) {
       bg = undefined;
-      // {
-      //   id: v4(),
-      //   name: "",
-      //   path: ""
-      // };
     }
     Vue.set(state.animationBook, "bg", bg);
   },
@@ -241,6 +257,18 @@ const mutations = {
     });
     Vue.set(state.animationElement, "eventList", copyEventList);
   },
+  // 删除当前动画的操作
+  DELETE_ANIMATION_EVENT(
+    state: any,
+    payload: { id: string; type: "auto" | "click" | "animactionComplete" }
+  ) {
+    const { id, type } = payload;
+    const eventList = state.animationElement.eventList[type];
+    const index = eventList.findIndex((i: Event) => i.id === id);
+    if (index !== -1) {
+      eventList.splice(index, 1);
+    }
+  },
 };
 
 const actions = {
@@ -257,9 +285,22 @@ const actions = {
   initAnimationBook({ commit }: any) {
     commit("INIT_ANIMATION_BOOK");
     // 初始化
-  }, // 添加绘本
+  },
+  // 添加绘本
   addPictureBook({ commit }: any, pictureBook: PictureBook): void {
     commit("ADD_PICTURE_BOOK", cloneDeep(pictureBook));
+  },
+  // 修改绘本基础信息
+  updatePictureBook({ commit }: any, { id, picture }: any): void {
+    commit("UPDATE_PICTURE_BOOK", { id, picture });
+  },
+  // 复制当前页
+  copyCurAnimationBook({ commit }: any) {
+    commit("COPY_CURRENT_ANIMATION_BOOK");
+  },
+  // 粘贴当前页
+  pasteCurAnimationBook({ commit }: any, pageIndex: number) {
+    commit("PASTE_CURRENT_ANIMATION_BOOK", pageIndex);
   },
   // 更新当前正在修改的绘本
   setCurrentEditPictureBook({ commit, state }: any, id: string): void {
@@ -273,7 +314,6 @@ const actions = {
     if (wordList) {
       state.wordList = wordList;
     }
-    console.log(currentPicture, "当前绘本");
   },
   // 保存当前插画页进入当前绘本并且推入electron-store
   saveAnimationBook({ commit }: any) {
@@ -300,8 +340,8 @@ const actions = {
     commit("DELETE_SOURCE_TO_CURRENT_BOOK", payload);
   },
   // 清空当前选择的动画
-  clearAnimationStyle({commit}:any) {
-    commit("CLEAR_ANIMATION_STYLE")
+  clearAnimationStyle({ commit }: any) {
+    commit("CLEAR_ANIMATION_STYLE");
   },
   // 点击切换当前插画页的动画(事件，音乐xxx之类)
   changeAnimationStyle({ commit }: any, animationId: number) {
@@ -313,8 +353,13 @@ const actions = {
   },
   // 为当前插画下的动画元素增加事件/修改事件
   updateAnimationEvent({ commit }: any, payload: Event) {
-    // nothing
     commit("UPDATE_ANIMATION_EVENT", payload);
+  },
+  delAnimationEvent(
+    { commit }: any,
+    payload: { id: string; type: "auto" | "click" | "animactionComplete" }
+  ) {
+    commit("DELETE_ANIMATION_EVENT", payload);
   },
   // 绘本canvas缩放比例
   changeScale({ commit }: any, { widthScale, heightScale }: any) {

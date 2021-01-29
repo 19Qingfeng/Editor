@@ -3,10 +3,19 @@ import { FilePath } from "./type";
 import { Source } from "../types";
 import path from "path";
 import cloneDeep from "lodash/cloneDeep";
+import { first } from "lodash";
 
 // 格式化路径 file协议
 export const normalizationPath = (path: string): string => {
   return `local-resource://${path}`;
+};
+
+// 根据文件名判断是动画还是图片
+export const decisionAnimation = (name: string): string => {
+  if (name.indexOf("_flr") !== -1) {
+    return "animation";
+  }
+  return "image";
 };
 
 const openSingleFileDialog = async (
@@ -46,14 +55,44 @@ const parseSourceList = (
 ): SourceList => {
   const result = Object.create(null);
   const source = cloneDeep(sourceList);
+  // 后缀名判断 第二优先级
   const sourceMap: any = {
     webp: "图片",
     mp3: "音乐",
     wav: "音效"
   };
+  // 第一优先级 文件名判断
+  const firstLevelSource: any = {
+    _bg: "背景",
+    _flr: "动画"
+  };
   // 添加了所有的图片和音乐以及音效
   source.forEach(file => {
     const { name } = file;
+    // 第一优先级判断 根据名称判断
+    for (const key of Object.keys(firstLevelSource)) {
+      if (name.indexOf(key) !== -1) {
+        // 存在
+        !result[firstLevelSource[key]] && (result[firstLevelSource[key]] = []);
+        result[firstLevelSource[key]].push(file);
+        return;
+      }
+    }
+    // // 判断是否是动画
+    // if (name.indexOf("_flr") !== -1) {
+    //   if (!result["动画"]) result["动画"] = [];
+    //   result["动画"].push(file);
+    //   return;
+    // }
+    // 等待确定了各系列命名这里 重新整理 之前写的逻辑全部在做添加
+    // 添加背景
+    // if (name.indexOf("_bg") !== -1) {
+    //   if (!result["背景"]) result["背景"] = [];
+    //   result["背景"].push(file);
+    //   return;
+    // }
+
+    // 书写第二优先级 根据后缀判断
     const extName = path.extname(name).replace(".", "");
     if (!Object.hasOwnProperty.call(sourceMap, extName)) return;
     if (!result[sourceMap[extName]]) {

@@ -55,6 +55,7 @@ import {
   getStringify,
   getCanvasSize,
   getPictureSize,
+  decisionAnimation,
   normalizationPath
 } from "@/utils/index";
 
@@ -65,6 +66,7 @@ export default {
       "animationBookList",
       "curAnimationBook",
       // "canvasScale",
+      "animationBookLength",
       "curAnimationElement", // 当前canvas正在编辑的元素动画
       "canvasWidthScale",
       "canvasHeightScale",
@@ -172,7 +174,14 @@ export default {
     onDragOver(e) {
       e.preventDefault();
     },
+    validateSp() {
+      if (!this.animationBookLength) {
+        this.$message.warning("请选择插画");
+        return true;
+      }
+    },
     onDrop(e) {
+      if (this.validateSp()) return;
       const source = parseStringify(e.dataTransfer.getData("source"));
       const isFirst = parseStringify(e.dataTransfer.getData("isFirst"));
       const { x, y } = parseStringify(e.dataTransfer.getData("offset"));
@@ -243,8 +252,6 @@ export default {
     _handleFirstAnimation(e, { name, path }, offset) {
       const [offsetX, offsetY] = offset;
       getPictureSize(normalizationPath(path)).then(({ height, width }) => {
-        console.log(height, "height");
-        console.log(width, "width");
         const displayHeight = getActualDisplaySize(
           height,
           this.canvasHeightScale
@@ -257,8 +264,9 @@ export default {
         });
         const source = {
           id: v4(),
-          height,
+          type: decisionAnimation(name), // 根据文件名判断 到底是动画还是图片
           name,
+          height,
           width,
           left,
           top,
@@ -293,6 +301,7 @@ export default {
       this.changeAnimationBookBg({
         id: v4(),
         name,
+        type: "image",
         path
       });
     },
@@ -308,7 +317,6 @@ export default {
 
     // 新增
     _handleFirstTextEl(e, { id, name }, offset) {
-      console.log("新增");
       // 万年不变: 获得left width
       // 只是 固定给 200 200 fontsize 给定 16px字体大小
       const [offsetX, offsetY] = offset;
@@ -419,7 +427,7 @@ export default {
   .canvas {
     position: relative;
     overflow: hidden;
-    background: red;
+    background: #fff;
     margin: 0px;
     height: 100%;
     width: 100%;

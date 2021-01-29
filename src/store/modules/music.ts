@@ -26,7 +26,6 @@ const getters = {
 
 const mutations = {
   STOP_MUSIC(state: any) {
-    console.log(state.video, "videovideo");
     if (state.video?.src) {
       state.video.pause();
       state.videoName = "";
@@ -53,7 +52,6 @@ const actions = {
   async handleChangeVideo({ commit }: any, { path, name }: any) {
     const video = await loadedMusic(path);
     video.ontimeupdate = () => {
-      // console.log("变化了", video.currentTime);
       commit("CHANGE_CURRENT_TIME", video.currentTime);
     };
     commit("CHANGE_VIDEO", {

@@ -4,7 +4,7 @@ interface EsProps {
   name: string;
 }
 
-const name = "cys1";
+const name = "nx-editor";
 
 class EStore extends Store {
   pictureList: PictureBook[];
@@ -44,7 +44,7 @@ class EStore extends Store {
   }
 
   // 添加绘本
-  addPicture(pictureList: PictureBook[]) {
+  updatePicture(pictureList: PictureBook[]) {
     this.pictureList = pictureList;
     return this.savePicture();
   }

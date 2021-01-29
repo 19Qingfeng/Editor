@@ -80,9 +80,9 @@
     </div>
 
     <div slot="footer">
-      <el-button type="primary" @click="onSave" :loading="loading"
-        >创 建</el-button
-      >
+      <el-button type="primary" @click="onSave" :loading="loading">{{
+        btnText
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -150,6 +150,11 @@ export default class PictureDialog extends GreetingProps {
     guidance: [{ max: 200, message: "最多输入200位", trigger: "blur" }],
     zip: [{ validator: this.validateZip, trigger: "blur" }]
   };
+  get btnText() {
+    // eslint-disable-next-line vue/no-parsing-error
+    const text = this.id !== "" ? "编 辑" : "新 建";
+    return text;
+  }
   get dialogVisible() {
     return this.isShow;
   }
@@ -259,7 +264,15 @@ export default class PictureDialog extends GreetingProps {
     };
   }
   onSavePicture(picture: PictureBook) {
-    this.$store.dispatch("picture/addPictureBook", picture);
+    // 如果id存在那么就是更新
+    if (this.id) {
+      this.$store.dispatch("picture/updatePictureBook", {
+        id: this.id,
+        picture
+      });
+    } else {
+      this.$store.dispatch("picture/addPictureBook", picture);
+    }
   }
   async onSave() {
     try {
@@ -271,7 +284,6 @@ export default class PictureDialog extends GreetingProps {
       const params = this.getParams(sourceList, wordObj);
       // 接下来就应该保存当前绘本信息
       this.onSavePicture(params);
-      console.log(params, "params");
       this.dialogVisible = false;
     } catch (err) {
       this.loading = false;
