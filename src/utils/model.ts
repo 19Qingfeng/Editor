@@ -14,6 +14,7 @@ class AnimationEvent implements Event {
     h: number;
   };
   loop?: boolean;
+  work?: string;
   level?: number;
   textBefore?: string;
   textAfter?: string;
@@ -24,6 +25,7 @@ class AnimationEvent implements Event {
     | "sound" // 配音
     | "transform" // 变换
     | "text" // 文本
+    | "readWork" // 点读
     | "bgSound" // 背景音乐
     | "effectSound"; // 播放音效;
   constructor(params: Event) {
@@ -31,6 +33,7 @@ class AnimationEvent implements Event {
     this.target = params.target;
     this.playSound = params.playSound; // 音乐name
     this.type = params.type;
+    this.work = params.work;
     this.eventType = params.eventType;
     // if (params.delay) {
     this.delay = params.delay;

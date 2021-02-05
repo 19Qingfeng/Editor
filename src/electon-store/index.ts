@@ -4,7 +4,7 @@ interface EsProps {
   name: string;
 }
 
-const name = "nx-editor";
+const name = "nx-editor2";
 
 class EStore extends Store {
   pictureList: PictureBook[];
@@ -23,6 +23,17 @@ class EStore extends Store {
   addAnimationBookInCurPicture(id: string, book: AnimationBook) {
     const result = this.pictureList.find(i => i.id === id);
     result?.animationBookList.push(book);
+    this.savePicture();
+  }
+
+  // 删除绘本中的插画
+  delAnimationBookInCurPicture(id: string, index: number) {
+    const result = this.pictureList.find(i => i.id === id);
+    // result?.animationBookList.push(book);
+    console.log(index, "index");
+    console.log(result, "result");
+    result?.animationBookList.splice(index, 1);
+    // debugger;
     this.savePicture();
   }
 

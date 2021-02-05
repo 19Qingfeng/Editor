@@ -126,6 +126,7 @@ const mutations = {
   },
   COPY_CURRENT_ANIMATION_BOOK(state: any) {
     const cloneBook = cloneDeep(state.animationBook);
+    console.log(cloneBook, "cloneBook");
     cloneBook.id = v4();
     state.copyAnimationBook = cloneBook;
   },
@@ -148,9 +149,42 @@ const mutations = {
     state.pictureList = store.getPicture();
   },
   ADD_ANIMATION_BOOK(state: any, book: AnimationBook) {
-    state.currentPicture.animationBookList.push(book);
+    state.currentPicture.animationBookList.push(book); // 更新currentPicture中的绘本 为了当前canvas画布
     const { id } = state.currentPicture;
-    store.addAnimationBookInCurPicture(id, book);
+    store.addAnimationBookInCurPicture(id, book); // 保存eletron-store
+    state.pictureList = store.getPicture(); // 强制更新vuex-pictureList 为了主页和每次不刷新重新进入
+  },
+  DEL_ANIMATION_BOOK(state: any, id: string) {
+    const index = state.currentPicture.animationBookList.findIndex(
+      (i: AnimationBook) => i.id === id
+    );
+    if (index === -1) return;
+    const { id: pictureId } = state.currentPicture;
+    // 当前绘本删除 currentPicture
+    state.currentPicture.animationBookList.splice(index, 1);
+    // electron中删除 然后进行处理
+    store.delAnimationBookInCurPicture(pictureId, index);
+    // 更新仓库
+    state.pictureList = store.getPicture(); // 当前所有绘本信息 首页使用
+    const reduceLength = state.currentPicture.animationBookList.length;
+    // 判断是否是当前插画页 删除当前正在编辑页
+    if (id === state.animationBook.id) {
+      if (reduceLength === 0) {
+        // 清空
+        state.animationBook = {};
+        state.animationBookIndex = 0;
+      } else {
+        state.animationBook =
+          state.currentPicture.animationBookList[reduceLength - 1];
+        state.animationBookIndex = reduceLength - 1;
+      }
+      state.animationElement = {};
+    } else {
+      // 删除的不是正在编辑的
+      state.animationBookIndex = state.currentPicture.animationBookList.findIndex(
+        (i: AnimationBook) => i.id === state.animationBook.id
+      );
+    }
   },
   CHANGE_ANIMATION_BOOK(state: any, id: string) {
     for (const [
@@ -281,6 +315,16 @@ const actions = {
     state.animationBook = {};
     state.currentPicture = {};
   },
+  // 删除整个绘本
+  delPictureBook({ state }: any, id: string) {
+    const index = state.pictureList.findIndex((i: PictureBook) => {
+      return i.id === id;
+    });
+    if (index !== -1) {
+      state.pictureList.splice(index, 1);
+      store.updatePicture(state.pictureList);
+    }
+  },
   // 初始化绘本 当前页
   initAnimationBook({ commit }: any) {
     commit("INIT_ANIMATION_BOOK");
@@ -322,6 +366,10 @@ const actions = {
   // 当前绘本下添加插画
   addAnimationBook({ commit }: any, book: AnimationBook) {
     commit("ADD_ANIMATION_BOOK", book);
+  },
+  // 删除当前绘本下的插画页
+  delAnimationBook({ commit }: any, id: string) {
+    commit("DEL_ANIMATION_BOOK", id);
   },
   // 切换绘本下的插画
   changeAnimationBook({ commit }: any, id: string) {

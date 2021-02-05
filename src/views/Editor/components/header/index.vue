@@ -62,9 +62,13 @@ export default {
     AnimationList
   },
   computed: {
-    ...mapGetters("picture", ["curAnimationBookIndex", "animationBookList"]),
+    ...mapGetters("picture", [
+      "curAnimationElement",
+      "curAnimationBookIndex",
+      "animationBookList"
+    ]),
     ...mapGetters("music", ["speedProcess"]),
-    ...mapState("picture", ["currentPicture"]),
+    ...mapState("picture", ["currentPicture", "copyAnimationBook"]),
     ...mapState("music", [
       "video",
       "videoDuration",
@@ -112,7 +116,8 @@ export default {
               cancelButtonText: "取消",
               type: "warning"
             }).then(() => {
-              if (!this.animationBookList.length) return;
+              if (!this.animationBookList.length || !this.copyAnimationBook.id)
+                return;
               this.pasteCurAnimationBook(this.curAnimationBookIndex);
               this.$message.success({
                 showClose: true,
@@ -124,13 +129,15 @@ export default {
         {
           text: "顶层",
           on: () => {
-            this.handleChangePage(0);
+            // this.handleChangePage(0);
+            this.handleChangeAnimationLevel(2000);
           }
         },
         {
           text: "底层",
           on: () => {
-            this.handleChangePage(this.animationBookList.length - 1);
+            // this.handleChangePage(this.animationBookList.length - 1);
+            this.handleChangeAnimationLevel(1);
           }
         },
         {
@@ -155,7 +162,8 @@ export default {
       "saveAnimationBook",
       "changeAnimationBook",
       "copyCurAnimationBook",
-      "pasteCurAnimationBook"
+      "pasteCurAnimationBook",
+      "updateAnimationStyle"
     ]),
     ...mapActions("music", ["hanldeStopMusic"]),
     // 打开绘本中的插画弹窗
@@ -181,6 +189,15 @@ export default {
     // 停止音乐
     handleStopMusic() {
       this.hanldeStopMusic();
+    },
+    // 层级
+    handleChangeAnimationLevel(level) {
+      if (!this.curAnimationElement.id) return;
+      const { id } = this.curAnimationElement;
+      this.updateAnimationStyle({
+        id,
+        level
+      });
     },
     // 切换页数
     handleChangePage(index) {

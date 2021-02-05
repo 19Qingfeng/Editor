@@ -4,6 +4,18 @@
       <title-cmp :title="title" :btnList="btnList" />
     </div>
     <div class="source-list">
+      <div class="title">
+        <div class="title">热区</div>
+        <div
+          class="source"
+          @dragstart="onDragStart"
+          :data-source="saveHotDataset()"
+          draggable="true"
+        >
+          <!-- 热区元素 本地找一个assets -->
+          热区
+        </div>
+      </div>
       <div v-for="(value, key) in formatSourceList" :key="key">
         <div class="title">{{ key }}</div>
 
@@ -49,6 +61,7 @@
 
 <script>
 import TitleCmp from "@/components/TitleHeader";
+import { v4 } from "uuid";
 import {
   parseSourceList,
   getStringify,
@@ -93,6 +106,15 @@ export default {
     initSourceList() {
       // 同时应该增加文字的source 文字的source没有path
       this.formatSourceList = parseSourceList(this.sourceList, this.wordList);
+    },
+    saveHotDataset() {
+      const hot = {
+        name: "hot",
+        id: v4(),
+        type: "hot",
+        path: require("@/assets/hot.png")
+      };
+      return getStringify(hot);
     },
     saveDataset(value) {
       return getStringify(value);

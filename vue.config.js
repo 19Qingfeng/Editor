@@ -1,8 +1,9 @@
 module.exports = {
-  transpileDependencies: ["vuetify"],
+  // transpileDependencies: ["vuetify"],
   configureWebpack: {
     devtool: "source-map"
   },
+  productionSourceMap: process.env.NODE_ENV !== "production",
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true

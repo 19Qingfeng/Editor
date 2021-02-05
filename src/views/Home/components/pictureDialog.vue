@@ -118,6 +118,7 @@ export default class PictureDialog extends GreetingProps {
     tag: [1],
     age: 0,
     category: 0,
+    date: 0,
     preview: "预览",
     guidance: "指导"
   };
@@ -178,7 +179,7 @@ export default class PictureDialog extends GreetingProps {
   }
   backfillPicture(info: PictureBook): void {
     const {
-      baseInfo: { name, author, tag, age, category, preview, guidance },
+      baseInfo: { name, author, tag, age, category, preview, guidance, date },
       cover,
       zip
     } = info;
@@ -189,6 +190,7 @@ export default class PictureDialog extends GreetingProps {
       age,
       category,
       preview,
+      date,
       guidance
     };
     this.imgPath = cover;
@@ -248,6 +250,7 @@ export default class PictureDialog extends GreetingProps {
       age,
       category,
       preview,
+      date: Date.now(),
       guidance
     };
     const cover = this.imgPath;
@@ -287,6 +290,7 @@ export default class PictureDialog extends GreetingProps {
       this.dialogVisible = false;
     } catch (err) {
       this.loading = false;
+      console.log(err, "err");
     }
   }
 }

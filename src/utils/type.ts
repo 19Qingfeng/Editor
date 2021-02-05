@@ -54,6 +54,7 @@ export interface SpriteEvent {
     | "sound" // 配音
     | "transform" // 变换
     | "text" // 文本
+    | "readWork" // 电读
     | "bgSound" // 背景音乐
     | "effectSound"; // 播放音效
   widget_id: string; // 目标元素ID 音乐为空的
@@ -65,6 +66,7 @@ export interface SpriteEvent {
     w?: number;
     h?: number;
   };
+  work?: string; // 点读文字
   animations?: string; // 动画输入框输入的string
   playSound?: string; // 音乐播放的文件名
   text?: string; // text的内容 ？ 应该是ID 更新后的sourceId

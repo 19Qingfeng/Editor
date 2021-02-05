@@ -5,6 +5,7 @@ export interface BaseInfo {
   age: number;
   category: number;
   preview: string;
+  date: number;
   guidance: string;
   [props: string]: any;
 }
@@ -111,11 +112,13 @@ export interface Event {
     | "transform" // 变换
     | "text" // 文本
     | "bgSound" // 背景音乐
+    | "readWork" // 点读
     | "effectSound"; // 播放音效
   target?: string; // 目标动画ID
   animationName?: string; // 播放动画名城 暂时放成输入框
   playSound?: string; // 音频/音乐/背景的name 这里select绑定的是name
   delay?: number;
+  work?: string; // 点读输入的单词
   position?: {
     x: number;
     y: number;
@@ -127,3 +130,9 @@ export interface Event {
   textBefore?: string;
   textAfter?: string;
 }
+
+// "type":"readWork",
+//                                 "widget_id":"sp03/sp03_houzi.flr",
+//                                 "action_id":"xxxxxxxxxx-xxx22xx-03",
+//                                 "delay":300,
+//                                 "work":"Monkey"

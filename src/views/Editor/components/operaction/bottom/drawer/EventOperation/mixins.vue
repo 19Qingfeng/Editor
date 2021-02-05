@@ -185,6 +185,20 @@ export default {
           textAfter: val
         });
       }
+    },
+    // 点击读东西
+    curReadWork: {
+      get() {
+        // nothing
+        return this.curEvent.work;
+      },
+      set(val) {
+        this.updateAnimationEvent({
+          id: this.id,
+          eventType: this.eventType,
+          work: val
+        });
+      }
     }
   },
   methods: {
@@ -214,7 +228,8 @@ export default {
         bgSound: "播放音乐",
         transform: "更新位置",
         stopAnimation: "停止动画",
-        text: "更新文本"
+        text: "更新文本",
+        readWork: "点读"
       };
       return typeList[type];
     },

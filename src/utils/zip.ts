@@ -16,6 +16,7 @@ const unZipByAd = (path: string): string => {
 const getAllSourcePath = async (path: string): Promise<Source[]> => {
   const sourceDirPath = unZipByAd(path);
   // 读取文件夹中的所有文件数据
+  debugger;
   const originSourceList = await fs.promises.readdir(sourceDirPath);
   // 取得file协议路径 以及对应的文件名
   const filterSource = originSourceList.filter(i => /^(?!\.)/.test(i));
@@ -26,6 +27,7 @@ const getAllSourcePath = async (path: string): Promise<Source[]> => {
       name
     };
   });
+  console.log(sourceList, "sourceList");
   return sourceList;
 };
 

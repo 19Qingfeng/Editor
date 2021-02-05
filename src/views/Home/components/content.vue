@@ -3,18 +3,24 @@
     <div v-for="book in pictureList" :key="book.id" class="picture-wrapper">
       <img class="img" :src="book.cover" />
       <div class="content-wrapper">
-        <div>{{ book.baseInfo.name }}</div>
-        <div>张数</div>
-        <div>日期</div>
+        <div v-for="(value, key) in getPictureBaseInfo(book)" :key="key">
+          {{ value }}
+        </div>
+        <div>{{ getPictureSize(book) }}张</div>
       </div>
       <div class="btn-wrapper">
-        <el-button @click="handleEditBase(book.id)">基础信息</el-button>
         <el-button
           @click="handleEditBook(book.id)"
           type="primary"
           icon="el-icon-eleme"
           >绘本</el-button
         >
+        <el-button @click="handleEditBase(book.id)">基础信息</el-button>
+        <el-button
+          icon="el-icon-delete"
+          circle
+          @click="handleDelete(book.id)"
+        ></el-button>
       </div>
     </div>
   </div>
@@ -22,6 +28,7 @@
 
 <script>
 import { mapState } from "vuex";
+import { parseTime } from "@/utils/index";
 export default {
   props: {
     id: {
@@ -42,6 +49,26 @@ export default {
       this.$emit("update:id", id);
       this.$emit("update:isShow", true);
     },
+    // 删除
+    handleDelete(id) {
+      this.$confirm("此操作将永久删除该绘本, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.$emit("delPictureBook", id);
+      });
+    },
+    getPictureBaseInfo(book) {
+      const info = book.baseInfo;
+      return {
+        date: parseTime(info.date, "{y}-{m}-{d}"),
+        name: info.name
+      };
+    },
+    getPictureSize(book) {
+      return book.animationBookList.length;
+    },
     handleEditBook(id) {
       this.$emit("editPictureBook", id);
     }
@@ -53,6 +80,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   margin: 10px;
+  padding: 5px 10px;
   .picture-wrapper {
     width: 220px;
     height: 360px;
@@ -84,6 +112,8 @@ export default {
     .btn-wrapper {
       display: flex;
       width: 100%;
+      box-sizing: border-box;
+      margin: 0 10px;
       > button {
         flex: 1;
       }

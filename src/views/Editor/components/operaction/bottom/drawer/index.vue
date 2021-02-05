@@ -40,6 +40,7 @@ import BaseOpertion from "./EventOperation/base";
 import MusicOperation from "./EventOperation/music";
 import PositionOperation from "./EventOperation/position";
 import TextOpeartion from "./EventOperation/text";
+import ReadWorkOperation from "./EventOperation/readWork";
 import { AnimationEvent } from "@/utils/model";
 export default {
   name: "Drawer",
@@ -47,7 +48,8 @@ export default {
     BaseOpertion,
     MusicOperation,
     PositionOperation,
-    TextOpeartion
+    TextOpeartion,
+    ReadWorkOperation
   },
   data() {
     return {
@@ -80,6 +82,10 @@ export default {
         {
           value: "text",
           label: "更新文本"
+        },
+        {
+          value: "readWork",
+          label: "点读词"
         }
       ]
     };
@@ -119,7 +125,8 @@ export default {
         effectSound: "MusicOperation", // 音效
         bgSound: "MusicOperation", // 背景音乐
         transform: "PositionOperation", //位置
-        text: "TextOpeartion" // 文本
+        text: "TextOpeartion", // 文本
+        readWork: "ReadWorkOperation"
       };
       return moduleNameList[type];
     },
@@ -136,6 +143,7 @@ export default {
           h: 0
         },
         level: 1,
+        work: "",
         loop: false,
         type: this.operationType,
         textBefore: "",

@@ -17,7 +17,7 @@
             top: source.displayTop + 'px',
             left: source.displayLeft + 'px',
             zIndex: source.level,
-            background: getBackgroundImage(source.path)
+            background: getBackgroundImage(source.path, source.type === 'hot')
           }"
           draggable="true"
           @click="handleClick(source)"
@@ -122,7 +122,10 @@ export default {
         this.clearAnimationStyle();
       }
     },
-    getBackgroundImage(path) {
+    getBackgroundImage(path, normal = false) {
+      if (normal) {
+        return `url(${path}) center / 100% 100%`;
+      }
       if (!path) return "";
       return `url(${normalizationPath(path)}) center / 100% 100%`;
     },
@@ -189,6 +192,7 @@ export default {
       const sourceName = basename(name);
       const extName = extname(name);
       const isText = type === "text";
+      const isHot = type === "hot";
       const isPng = extName.indexOf("webp") !== -1;
       const isBg = sourceName.indexOf("_bg") !== -1;
       if (isBg) {
@@ -196,11 +200,85 @@ export default {
       } else if (isText) {
         // 文本
         this.hanldeDropText(e, source, isFirst, x, y);
+      } else if (isHot) {
+        this.handleDropHot(e, source, isFirst, x, y);
       } else if (!isBg && isPng) {
         // 动画元素
         this.hanldeNotBgPng(e, source, isFirst, x, y);
       }
     },
+    // 处理热区
+    handleDropHot(e, source, isFirst, ...offset) {
+      if (isFirst) {
+        this._handleFirstHot(e, source, offset);
+      } else {
+        this._handleNotFirstHot(e, source, offset);
+      }
+    },
+
+    _handleFirstHot(e, { name, path }, offset) {
+      const [offsetX, offsetY] = offset;
+      const width = 100;
+      const height = 100;
+      const displayHeight = getActualDisplaySize(
+        height,
+        this.canvasHeightScale
+      );
+      const displayWidth = getActualDisplaySize(width, this.canvasWidthScale);
+      // 计算相对于canvas画布的实际显示偏移位置 左上角
+      const { displayLeft, displayTop, top, left } = this.getOffset(e, {
+        offsetX,
+        offsetY
+      });
+      const source = {
+        id: v4(),
+        type: "hot",
+        name,
+        height,
+        width,
+        left,
+        top,
+        path,
+        displayHeight,
+        displayWidth,
+        displayTop,
+        displayLeft,
+        readingGuide: false,
+        level: 1,
+        firstAnimation: "", // 只有flr有 等待处理
+        originSize: {
+          displayHeight,
+          displayWidth,
+          width,
+          height
+        },
+        // eventList: [] // 初始化动画事件是空 修改初始化的EventList 是Object而非Array
+        eventList: {
+          auto: [],
+          click: [],
+          animactionComplete: []
+        }
+      };
+      this.addSourceToCurrentBook(source);
+    },
+
+    _handleNotFirstHot(e, source, offset) {
+      const { id } = source;
+      const [offsetX, offsetY] = offset;
+      // 计算相对于canvas画布的实际显示偏移位置 左上角
+      const { displayLeft, displayTop, top, left } = this.getOffset(e, {
+        offsetX,
+        offsetY
+      });
+      this.updateAnimationStyle({
+        id,
+        displayLeft,
+        displayTop,
+        top,
+        left
+      });
+    },
+
     // 处理非背景图
     hanldeNotBgPng(e, source, isFirst, ...offset) {
       if (isFirst) {

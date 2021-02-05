@@ -11,6 +11,7 @@ const formatEvent = (eventList: Event[]): SpriteEvent[] => {
       type: event.type,
       widget_id: event.target || event.textBefore!,
       action_id: event.id,
+      word: event.work,
       delay: event.delay,
       position: {
         x: event.position?.x && event.position?.x - 210,

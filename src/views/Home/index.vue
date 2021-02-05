@@ -16,6 +16,7 @@
       :id.sync="id"
       :is-show.sync="isShow"
       @editPictureBook="editPictureBook"
+      @delPictureBook="deletePicture"
     />
 
     <dialog-cmp v-if="isShow" :id="id" :isShow.sync="isShow" />
@@ -42,7 +43,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    ...mapActions("picture", ["setCurrentEditPictureBook"]),
+    ...mapActions("picture", ["setCurrentEditPictureBook", "delPictureBook"]),
     addPictureBook() {
       this.id = "";
       this.isShow = true;
@@ -53,6 +54,9 @@ export default Vue.extend({
       this.$router.push({
         name: "Editor"
       });
+    },
+    deletePicture(id: string) {
+      this.delPictureBook(id);
     }
   }
 });

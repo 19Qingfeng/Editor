@@ -1,6 +1,6 @@
 {
-  "name": "Nx-Editor",
-  "version": "0.1.0",
+  "name": "Ed",
+  "version": "1.0.0",
   "author": "wang.haoyu<228233464@qq.com>",
   "private": true,
   "scripts": {

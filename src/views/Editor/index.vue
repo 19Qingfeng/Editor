@@ -55,6 +55,7 @@ export default {
     this.clearVuex();
   },
   created() {
+    console.log("created");
     this.initAnimationBook();
   }
 };
@@ -74,6 +75,8 @@ export default {
       height: 100%;
     }
     .canvas-cmp-wrapper {
+      // will-change: transform;
+      // transform: translate3d(0, 0, 0);
       height: 100%;
       width: 100%;
     }
