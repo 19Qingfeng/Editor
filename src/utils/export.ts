@@ -11,7 +11,7 @@ const formatEvent = (eventList: Event[]): SpriteEvent[] => {
       type: event.type,
       widget_id: event.target || event.textBefore!,
       action_id: event.id,
-      word: event.work,
+      work: event.work,
       delay: event.delay,
       position: {
         x: event.position?.x && event.position?.x - 210,
@@ -45,7 +45,7 @@ const formatSpriteList = (list: Animation[], bg: any): Sprite[] => {
       height: 1440,
       eventList: {
         auto: [], // this.formatEvent()
-        click: [],
+        click: [], // 替换为onTap 这个字段
         animactionComplete: []
       }
     };
@@ -59,6 +59,7 @@ const formatSpriteList = (list: Animation[], bg: any): Sprite[] => {
       widget_id: animation.id,
       type: animation.type, // 先占位 到时候得加字段 我这边 根据name区分一下  根据后缀区分一下
       tip: "", // 暂时无用
+      is_guide: true, // 热区独有属性 恒定为true
       file_name: animation.name, // 相对路径 得加字段 如果是文字 那么就处理成一起 非文字就打包到一起
       position: {
         x: animation.left - 210,
@@ -66,13 +67,13 @@ const formatSpriteList = (list: Animation[], bg: any): Sprite[] => {
         w: animation.width,
         h: animation.height
       },
-      animations: "", // 动画填的字段 字段需要 不理会值
+      animations: [], // 动画填的字段 字段需要 不理会值 (数组类型)
       first_animation: animation.firstAnimation,
       text: animation.sourceId,
-      attributes: "", // 富文本不管他
+      attributes: {}, // 富文本不管他 Object类型
       actions: {
         auto: formatEvent(animation.eventList.auto),
-        click: formatEvent(animation.eventList.click),
+        onTap: formatEvent(animation.eventList.click),
         animaction_complete: formatEvent(animation.eventList.animactionComplete)
       }
     };
@@ -83,7 +84,7 @@ const formatSpriteList = (list: Animation[], bg: any): Sprite[] => {
 const formatPageList = (pageList: AnimationBook[]): Page[] => {
   return pageList.map((page: AnimationBook, index: number) => {
     return {
-      interrupt: true, // 无用
+      interrupt: "true", // String类型 暂时无用
       page_index: index, // 索引
       color: "#fff", // 背景色
       sprite_list: formatSpriteList(page.animationList, page.bg) // 动画元素列表
@@ -99,7 +100,7 @@ const formatOuterObj = (editorJson: EditorJson): ExportJson => {
   const mapList = {
     title: "name",
     author: "author",
-    version: "1.0",
+    version: 1.0,
     creat_date: "",
     page_list: formatPageList(animationBookList)
   };

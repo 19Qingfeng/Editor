@@ -15,7 +15,7 @@ export interface ExportJson {
 }
 
 export interface Page {
-  interrupt: boolean;
+  interrupt: string;
   page_index: number;
   color: string;
   sprite_list: Sprite[];
@@ -33,13 +33,14 @@ export interface Sprite {
     w: number;
     h: number;
   };
-  animations?: string; // 动画动作 暂时不理会
+  is_guide?: boolean; // 热区独有属性 恒定为true
+  animations?: []; // 动画动作 暂时不理会 数组类型
   first_animation?: string;
   text?: string; // 文本资源ID 对应生成JSON中的ID
   attributes?: any; // 富文本不理会
   actions: {
     auto: SpriteEvent[];
-    click: SpriteEvent[];
+    onTap: SpriteEvent[];
     animaction_complete: SpriteEvent[];
   };
 }

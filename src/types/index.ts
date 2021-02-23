@@ -70,7 +70,7 @@ export interface Animation {
   level: number; // 层级
   eventList: {
     auto: Event[];
-    click: Event[];
+    click: Event[]; // 对应onTap
     animactionComplete: Event[];
   }; // 动画存在事件绑定
 }
